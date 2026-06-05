@@ -1,0 +1,112 @@
+@import "../../variables";
+@import "../../components/languageSelector/LanguageSelector.scss";
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+
+  .dashboard-container-navbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 0 ($spacing-unit * 2);
+    background-color: $primary-color-light;
+
+    //btn mamu
+    .toggle-btn {
+      display: none;
+    }
+
+    //Navbar Logo
+    .authnavbar-container-logo {
+      // margin-left: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      .logo-image {
+        width: 4rem;
+        height: 4 rem;
+        padding-right: $spacing-unit;
+      }
+      .logo-name {
+        color: $accent-color-light;
+        font-weight: bold;
+        margin: 0;
+        font-size: $base-font-size;
+      }
+    }
+
+    //Navbvar control
+    .authnavbar-container-control {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      .control-label-langue {
+        margin-right: $spacing-unit;
+        color: $font-color-light;
+      }
+      .authnavbar-container-account {
+        margin-left: 1rem;
+        img {
+          width: 3rem;
+          height: 3rem;
+          border: 2px solid $accent-color;
+        }
+      }
+    }
+  }
+
+  .dashboard-container-content {
+    color: $font-color-light;
+    background-color: $secondary-color-light;
+    display: flex;
+    justify-content: space-between;
+    .content-sidebar {
+      top: 0;
+      position: sticky;
+      width: 15%;
+      padding: 0 1rem;
+      margin-top: $spacing_unit;
+      margin-bottom: 1rem;
+      max-height: 100vh;
+      box-shadow: $box-shadow;
+      background-color: $primary-color-light;
+      color: $font-color-light;
+      z-index: 900;
+      .content-sidebar-list {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        transition: color 0.3s;
+        a {
+          color: $font-color-light;
+          display: block;
+          padding: 1rem 0.5rem;
+          &:hover {
+            background-color: $secondary-color-light;
+          }
+        }
+      }
+    }
+    .content-container {
+      width: 80%;
+      min-height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+  }
+  .copyright-container-content {
+    background-color: $primary-color-light;
+    padding: $spacing-unit;
+    text-align: center;
+    font-size: $base-font-size;
+    width: auto;
+    p {
+      color: $font-color-light;
+    }
+  }
+}
