@@ -40,7 +40,7 @@ export const getServicesAndSubServices = (language) => {
           "Install fixtures service",
           "Plumbing inspections",
         ],
-        "Carpentry and woodworking Services": [
+        "Carpentry and Woodworking Services": [
           "Repairing wooden structures",
           "wooden sculpture",
         ],

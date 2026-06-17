@@ -1,35 +1,438 @@
 @import "../../variables";
 
-.userslist-container {
-  background-color: $primary-color-light;
-  .service-navbar {
-    h2 {
-      padding: 0 0.5rem;
+.userslist {
+  min-height: 100vh;
+  padding-bottom: 5rem;
+  transition: background-color 0.3s ease, color 0.3s ease;
+
+  // Directory Hero Header
+  .directory-header {
+    background: linear-gradient(135deg, rgba(255, 127, 0, 0.08) 0%, rgba(0, 0, 0, 0.02) 100%);
+    padding: 5rem 2rem 4rem;
+    text-align: center;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+
+    .header-content {
+      max-width: 800px;
+      margin: 0 auto;
+
+      h1 {
+        font-size: 2.75rem;
+        font-weight: 850;
+        line-height: 1.2;
+        margin-bottom: 1rem;
+        letter-spacing: -0.5px;
+      }
+
+      p {
+        font-size: 1.15rem;
+        line-height: 1.5;
+        opacity: 0.8;
+      }
     }
   }
+
+  // Container wrapper
+  .userslist-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem;
+  }
+
+  // Filters Panel
+  .directory-filters-container {
+    margin-bottom: 2.5rem;
+
+    .filters-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 1.25rem;
+      padding: 1.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+
+      .filters-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+
+        h3 {
+          font-size: 1.1rem;
+          font-weight: 750;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin: 0;
+
+          .filter-title-icon {
+            color: $accent-color;
+          }
+        }
+
+        .clear-filters-btn {
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+          background: none;
+          border: none;
+          color: $accent-color;
+          font-size: 0.85rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          padding: 0.3rem 0.6rem;
+          border-radius: 0.5rem;
+
+          &:hover {
+            background: rgba(255, 127, 0, 0.08);
+            color: darken($accent-color, 10%);
+          }
+        }
+      }
+
+      .filters-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.25rem;
+
+        .filter-group {
+          display: flex;
+          flex-direction: column;
+          text-align: left;
+
+          label {
+            font-size: 0.72rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: darken($accent-color, 5%);
+          }
+
+          .select-wrapper {
+            position: relative;
+            width: 100%;
+
+            .select-icon {
+              position: absolute;
+              left: 0.8rem;
+              top: 50%;
+              transform: translateY(-50%);
+              color: $accent-color;
+              font-size: 0.95rem;
+              pointer-events: none;
+              z-index: 2;
+            }
+
+            select {
+              width: 100%;
+              height: 2.8rem;
+              padding: 0 1.8rem 0 2.2rem;
+              font-size: 0.85rem;
+              font-weight: 550;
+              border-radius: 0.75rem;
+              border: 1.5px solid rgba(0, 0, 0, 0.08);
+              background: #fff;
+              color: #2c2c30;
+              cursor: pointer;
+              appearance: none;
+              -webkit-appearance: none;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              overflow: hidden;
+              transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+              z-index: 1;
+
+              &:hover:not(:disabled) {
+                border-color: rgba(255, 127, 0, 0.35);
+              }
+
+              &:focus {
+                outline: none;
+                border-color: $accent-color;
+                box-shadow: 0 0 0 3px rgba(255, 127, 0, 0.12);
+              }
+
+              &:disabled {
+                background-color: #f5f5f7;
+                color: #b5b5c0;
+                border-color: rgba(0, 0, 0, 0.05);
+                cursor: not-allowed;
+              }
+            }
+
+            &::after {
+              content: "";
+              display: block;
+              width: 5px;
+              height: 5px;
+              border-right: 2px solid #777;
+              border-bottom: 2px solid #777;
+              position: absolute;
+              right: 0.9rem;
+              top: 45%;
+              transform: translateY(-50%) rotate(45deg);
+              pointer-events: none;
+              transition: transform 0.25s ease, border-color 0.25s ease;
+              z-index: 2;
+            }
+
+            &:focus-within::after {
+              transform: translateY(-20%) rotate(-135deg);
+              border-color: $accent-color;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Directory Card Grid Results
   .service-card {
-    padding: $spacing-unit 1rem;
-    padding-bottom: $spacing-unit;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: $spacing-unit;
+    gap: 2rem;
+
+    .card {
+      width: 100%;
+      max-width: 100%;
+
+      .card-container {
+        max-width: 100%;
+        width: 100%;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        background: #fff;
+
+        &:hover {
+          transform: translateY(-5px);
+          border-color: $accent-color;
+          box-shadow: 0 8px 25px rgba(255, 127, 0, 0.15);
+        }
+      }
+    }
+  }
+
+  // Loading spinner
+  .directory-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 6rem 0;
+
+    .spinner {
+      width: 2.5rem;
+      height: 2.5rem;
+      border: 3px solid rgba(255, 127, 0, 0.1);
+      border-radius: 50%;
+      border-top-color: $accent-color;
+      animation: spin 1s ease-in-out infinite;
+    }
+  }
+
+  // No Results State
+  .no-results-container {
+    text-align: center;
+    padding: 5rem 2rem;
+    background: rgba(0, 0, 0, 0.015);
+    border-radius: 1.25rem;
+    border: 1px dashed rgba(0, 0, 0, 0.08);
+
+    h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      opacity: 0.8;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.5;
+    }
+
+    .clear-filters-btn-large {
+      padding: 0.75rem 1.75rem;
+      background: $accent-color;
+      color: #fff;
+      border: none;
+      border-radius: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(255, 127, 0, 0.25);
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: darken($accent-color, 5%);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(255, 127, 0, 0.35);
+      }
+    }
+  }
+
+  // Light / Dark Theme styling
+  &.light {
+    background-color: #fbfbfd;
+    color: #1a1a1e;
+
+    .directory-header {
+      background: linear-gradient(135deg, rgba(255, 127, 0, 0.08) 0%, rgba(0, 0, 0, 0.02) 100%);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      h1 {
+        color: #111115;
+      }
+      p {
+        color: #55555c;
+      }
+    }
+  }
+
+  &.dark {
+    background-color: #121212;
+    color: #f5f5fa;
+
+    .directory-header {
+      background: linear-gradient(135deg, rgba(255, 127, 0, 0.15) 0%, rgba(0, 0, 0, 0.5) 100%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      h1 {
+        color: #fff;
+      }
+      p {
+        color: #ccc;
+      }
+    }
+
+    .directory-filters-container {
+      .filters-card {
+        background: rgba(30, 26, 23, 0.75);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+
+        .filters-header {
+          border-bottom-color: rgba(255, 255, 255, 0.08);
+          h3 {
+            color: #fff;
+          }
+        }
+
+        .filters-grid {
+          .filter-group {
+            label {
+              color: #ff9f40;
+            }
+            .select-wrapper {
+              .select-icon {
+                color: #ff9f40;
+              }
+
+              select {
+                background: rgba(255, 255, 255, 0.03);
+                color: #fff;
+                border-color: rgba(255, 255, 255, 0.08);
+
+                &:hover:not(:disabled) {
+                  border-color: rgba(255, 127, 0, 0.5);
+                }
+
+                &:focus {
+                  border-color: $accent-color;
+                  box-shadow: 0 0 0 3px rgba(255, 127, 0, 0.25);
+                  background-color: #1e1a17;
+                }
+
+                &:disabled {
+                  background-color: rgba(255, 255, 255, 0.01);
+                  color: #666;
+                  border-color: rgba(255, 255, 255, 0.03);
+                }
+              }
+
+              &::after {
+                border-color: #aaa;
+              }
+
+              &:focus-within::after {
+                border-color: #ff9f40;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .service-card {
+      .card {
+        .card-container {
+          background: #1e1a17;
+          border-color: rgba(255, 255, 255, 0.05);
+
+          &:hover {
+            border-color: $accent-color;
+            box-shadow: 0 8px 25px rgba(255, 127, 0, 0.25);
+          }
+        }
+      }
+    }
+
+    .no-results-container {
+      background: rgba(255, 255, 255, 0.01);
+      border-color: rgba(255, 255, 255, 0.08);
+      h3 {
+        color: #ddd;
+      }
+    }
   }
 }
-@include breakpoint-small($tablet-breakpoint) {
-  .userslist-container {
-    background-color: $primary-color-light;
-    .service-navbar {
-      h2 {
-        padding: 0 0.5rem;
+
+// Media Queries for Directories Responsiveness
+@media (max-width: 1024px) {
+  .userslist {
+    .service-card {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .userslist {
+    .directory-header {
+      padding: 4rem 1.5rem 3rem;
+      h1 {
+        font-size: 2.25rem;
+      }
+      p {
+        font-size: 1.05rem;
       }
     }
     .service-card {
-      padding: $spacing-unit 1rem;
-      padding-bottom: $spacing-unit;
-      display: grid;
-      grid-template-columns: repeat(1, 1fr);
-      place-items: center;
-      gap: $spacing-unit;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem;
     }
   }
+}
+
+@media (max-width: 480px) {
+  .userslist {
+    .userslist-container {
+      padding: 1.5rem 1rem;
+    }
+    .directory-filters-container {
+      .filters-card {
+        padding: 1.25rem;
+      }
+    }
+    .service-card {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

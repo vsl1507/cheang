@@ -1,76 +1,92 @@
 @import "../../variables";
-.theme-switch {
-  position: relative;
+
+.theme-toggle-btn {
+  background: transparent;
+  border: 1.5px solid rgba(0, 0, 0, 0.08);
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
   display: flex;
   align-items: center;
-  margin: 1rem;
-  //   background-color: red;
-}
-
-.switch-mode {
-  position: relative;
-  display: inline-block;
-  padding: 0.5rem 2rem;
-}
-
-.switch-mode input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.slider {
-  position: absolute;
+  justify-content: center;
   cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: 0.4s;
-  transition: 0.4s;
-  border-radius: 2rem;
-}
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0;
+  outline: none;
 
-.slider:before {
-  background-size: cover;
-  background-image: url("https://png.pngtree.com/png-clipart/20220812/ourmid/pngtree-shine-sun-light-effect-free-png-and-psd-png-image_6106445.png"); /* Image for the "on" state */
-  position: absolute;
-  content: "";
-  height: 2.1rem;
-  width: 2.1rem;
-  left: 0.1rem;
-  bottom: 0.1rem;
-  background-color: white;
-  -webkit-transition: 0.4s;
-  transition: 0.4s;
-  border-radius: 50%;
-}
-
-input:checked + .slider:before {
-  background-image: url("https://pngfre.com/wp-content/uploads/moon-58-1024x1024.png"); /* Image for the "off" state */
-  -webkit-transform: translateX(2.5rem);
-  -ms-transform: translateX(2.5rem);
-  transform: translateX(2.1rem);
-}
-
-@include breakpoint-small($desktop-breakpoint) {
-  .theme-switch {
-    margin: 1rem 0;
-    margin-top: 0;
-  }
-  .switch-mode {
-    padding: 0.1rem 1.5rem;
-  }
-  .slider {
+  .icon-wrapper {
+    display: flex;
     align-items: center;
+    justify-content: center;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  .slider:before {
-    height: 1.4rem;
-    width: 1.4rem;
-    left: 0.1rem;
+
+  // Icons
+  .sun-icon {
+    font-size: 1.15rem;
+    color: #ff7f00; // Bright orange
+    animation: rotate-in 0.5s ease-out;
   }
-  input:checked + .slider:before {
-    transform: translateX(1.9rem);
+
+  .moon-icon {
+    font-size: 1.1rem;
+    color: #ffd27f; // Gold/yellow moon
+    animation: rotate-in 0.5s ease-out;
+  }
+
+  // Theme-specific styles
+  &.light {
+    background-color: rgba(0, 0, 0, 0.03);
+    border-color: rgba(0, 0, 0, 0.08);
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.06);
+      border-color: rgba(0, 0, 0, 0.15);
+      transform: scale(1.06);
+      box-shadow: 0 4px 12px rgba(255, 127, 0, 0.15);
+      
+      .icon-wrapper {
+        transform: rotate(45deg);
+      }
+    }
+  }
+
+  &.dark {
+    background-color: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.12);
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.25);
+      transform: scale(1.06);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      
+      .icon-wrapper {
+        transform: rotate(-30deg);
+      }
+    }
+  }
+}
+
+// Icon entry keyframes
+@keyframes rotate-in {
+  from {
+    transform: rotate(-180deg) scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: rotate(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 1024px) {
+  .theme-toggle-btn {
+    width: 2.25rem;
+    height: 2.25rem;
+    
+    .sun-icon, .moon-icon {
+      font-size: 1rem;
+    }
   }
 }

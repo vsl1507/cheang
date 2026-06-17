@@ -1,4 +1,9 @@
-import { layouts } from "chart.js";
+/* eslint-disable react/prop-types */
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useLanguage } from "../../context/LanguageContext";
+import { useTheme } from "../../context/ThemeContext";
 import Logo from "../../assets/logo.png";
 import {
   NavigationLink,
@@ -8,128 +13,129 @@ import {
   getAbout,
   getBecomePro,
   getHome,
-  getLanguage,
   getService,
   getSignup,
 } from "../../data/wordsLanguage";
-import { useLanguage } from "../../context/LanguageContext";
 import ServiceList from "../../data/ServiceList";
 import LanguageSelector from "../../components/languageSelector/LanguageSelector";
 import ThemeSelector from "../../components/themeSelector/ThemeSelector";
-import { useTheme } from "../../context/ThemeContext";
-import { useEffect, useState } from "react";
-import "./MainNavbar.scss";
-import { Link, useParams } from "react-router-dom";
 import Profile from "../../components/profile/Profile";
-import { useSelector } from "react-redux";
+import { FaBars, FaTimes } from "react-icons/fa";
+import "./MainNavbar.scss";
 
 const MainNavbar = ({ page }) => {
-  //User
   const { currentUser } = useSelector((state) => state.user);
-  //Theme and Language
   const { theme } = useTheme();
   const { language, changeLanguage } = useLanguage();
+  const [showMenu, setShowMenu] = useState(false);
+
   const handleLanguageChange = (newLanguage) => {
     changeLanguage(newLanguage);
   };
 
-  //Show menu
-  const [showMenu, setShowMenu] = useState(false);
   const toggleMenu = () => {
     setShowMenu(!showMenu);
   };
 
-  useEffect(() => {}, [currentUser]);
+  // Close menu when resizing to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 1024) {
+        setShowMenu(false);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
-  //Link Page
   const pageLink = page;
 
   return (
-    <nav className={`navbar ${theme}`}>
-      <div className={showMenu ? "navbar-container-menu" : "navbar-container"}>
-        <button className="toggle-btn" onClick={toggleMenu}>
-          &#9776;
+    <nav className={`navbar-wrapper ${theme}`}>
+      <div className="navbar-container">
+        {/* Hamburger Menu Toggle (Mobile) */}
+        <button className="mobile-menu-toggle" onClick={toggleMenu}>
+          {showMenu ? <FaTimes /> : <FaBars />}
         </button>
 
-        {/* Logo */}
-        <div className="navbar-container-logo">
-          <img href="/" src={Logo} alt="Logo" className="logo-image" />
-          <a href="/" className="logo-image-link"></a>
-          <p className="logo-name">Cheang</p>
+        {/* Logo and Brand */}
+        <div className="navbar-logo-section">
+          <Link to="/" className="logo-link">
+            <img src={Logo} alt="Cheang Logo" className="logo-img" />
+            <span className="brand-name">Cheang</span>
+          </Link>
         </div>
 
-        {/* Link */}
-        <div className="navbar-container-links">
-          {pageLink === "home" ? (
-            <NavigationLinkDisabled value={getHome(language)} />
-          ) : (
-            <NavigationLink href="/" value={getHome(language)} />
-          )}
+        {/* Navigation Links */}
+        <div className={`navbar-links-section ${showMenu ? "active" : ""}`}>
+          <div className="nav-item">
+            {pageLink === "home" ? (
+              <NavigationLinkDisabled value={getHome(language)} />
+            ) : (
+              <NavigationLink href="/" value={getHome(language)} />
+            )}
+          </div>
 
-          <div className="link-dropdown">
+          <div className="nav-item dropdown">
             {pageLink === "service" ? (
               <NavigationLinkDisabled value={getService(language)} />
             ) : (
               <NavigationLink href="/service" value={getService(language)} />
             )}
-
-            <div className="link-dropdown-content">
-              {ServiceList.map((serivce) => (
-                <NavigationLink
-                  // href={`/service-list/${serivce.nameLink.toLowerCase()}`}
-                  value={serivce.value}
-                  key={serivce.id}
-                />
+            
+            <div className="dropdown-menu-list">
+              {ServiceList.map((service) => (
+                <Link
+                  to={`/userlist/${service.value}`}
+                  className="dropdown-item-link"
+                  key={service.id}
+                  onClick={() => setShowMenu(false)}
+                >
+                  {service.value}
+                </Link>
               ))}
             </div>
           </div>
 
-          {pageLink === "about" ? (
-            <NavigationLinkDisabled value={getAbout(language)} />
-          ) : (
-            <NavigationLink value={getAbout(language)} href="/about" />
-          )}
+          <div className="nav-item">
+            {pageLink === "about" ? (
+              <NavigationLinkDisabled value={getAbout(language)} />
+            ) : (
+              <NavigationLink value={getAbout(language)} href="/about" />
+            )}
+          </div>
         </div>
 
-        {/* Contorl for button */}
-        <div className="navbar-container-control">
-          <ThemeSelector />
-          <span className="control-label-langue">
-            {getLanguage(language)} :
-          </span>
-          <LanguageSelector
-            currentLanguage={language}
-            onLanguageChange={handleLanguageChange}
-          />
-        </div>
+        {/* Controls and Account Panel */}
+        <div className="navbar-actions-section">
+          {/* Controls */}
+          <div className="actions-controls">
+            <ThemeSelector />
+            <LanguageSelector
+              currentLanguage={language}
+              onLanguageChange={handleLanguageChange}
+            />
+          </div>
 
-        {/* Account */}
-        <div className="navbar-container-account">
-          {currentUser ? (
-            <>
-              {currentUser.userPro ? (
-                <>
-                  <h3>{currentUser.uerPro}</h3>
-                  <Link to="/profile">
-                    <Profile src={currentUser.avatar} />
+          {/* Account Details */}
+          <div className="actions-account">
+            {currentUser ? (
+              <div className="user-profile-group">
+                {!currentUser.userPro && (
+                  <Link to="/signup-pro" className="become-pro-pill" onClick={() => setShowMenu(false)}>
+                    {getBecomePro(language)}
                   </Link>
-                </>
-              ) : (
-                <>
-                  <h3>{currentUser.uerPro}</h3>
-                  <NavigationLink
-                    href="/signup-pro"
-                    value={getBecomePro(language)}
-                  />
-                  <Link to="/profile">
-                    <Profile src={currentUser.avatar} />
-                  </Link>
-                </>
-              )}
-            </>
-          ) : (
-            <NavigationLink href="/signup" value={getSignup(language)} />
-          )}
+                )}
+                <Link to="/profile" className="avatar-link" onClick={() => setShowMenu(false)}>
+                  <Profile src={currentUser.avatar} />
+                </Link>
+              </div>
+            ) : (
+              <Link to="/signup" className="signup-outline-btn" onClick={() => setShowMenu(false)}>
+                {getSignup(language)}
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     </nav>

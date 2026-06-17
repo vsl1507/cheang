@@ -1,13 +1,13 @@
 import { FaRegStar, FaStar, FaStarHalfAlt } from "react-icons/fa";
 
-const ShowStar = ({ rating }) => {
+const ShowStar = ({ rating, size = "1.5rem" }) => {
   const fullStars = Math.floor(rating);
   const hasHalfStar = rating % 1 !== 0;
 
   const renderFullStars = () => {
     return Array.from({ length: fullStars }, (_, index) => (
       <span key={index}>
-        <FaStar style={{ fontSize: "1.5rem", color: "#ff7f00" }} />
+        <FaStar style={{ fontSize: size, color: "#ff7f00" }} />
       </span>
     ));
   };
@@ -15,7 +15,7 @@ const ShowStar = ({ rating }) => {
   const renderHalfStar = () => {
     return (
       <span>
-        <FaStarHalfAlt style={{ fontSize: "1.5rem", color: "#ff7f00" }} />
+        <FaStarHalfAlt style={{ fontSize: size, color: "#ff7f00" }} />
       </span>
     );
   };
@@ -24,7 +24,7 @@ const ShowStar = ({ rating }) => {
     const remainingStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
     return Array.from({ length: remainingStars }, (_, index) => (
       <span key={`empty-${index}`}>
-        <FaRegStar style={{ fontSize: "1.5rem", color: "#ff7f00" }} />
+        <FaRegStar style={{ fontSize: size, color: "#ff7f00" }} />
       </span>
     ));
   };

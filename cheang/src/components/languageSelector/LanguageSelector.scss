@@ -1,62 +1,187 @@
 @import "../../variables";
 
-%languageSelector-light {
-  .language-selector {
+.language-selector-custom {
+  position: relative;
+  display: inline-block;
+
+  // Header Dropdown Toggle Button
+  .lang-btn {
     display: flex;
     align-items: center;
-    margin-right: 1rem;
+    gap: 0.5rem;
+    background: transparent;
+    border: 1.5px solid rgba(0, 0, 0, 0.08);
+    border-radius: 2rem;
+    padding: 0.45rem 0.95rem;
+    font-size: 0.88rem;
+    font-weight: 750;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
 
-    select {
-      color: $font-color-dark;
-      background-color: $accent-color-light;
-      border: 0;
-      padding: 0.5rem 1rem;
-      border-radius: 0.5rem;
-      cursor: pointer;
-      &:focus {
-        outline: none;
-        background-color: $secondary-color-light;
-        border: 1px solid $accent-color-light;
-        color: $accent-color-light;
-        padding: 0.5rem 1rem;
-        .options {
-          background-color: $secondary-color-light;
-          border: 1px solid $accent-color-light;
-          color: $accent-color-light;
-        }
+    .globe-icon {
+      font-size: 0.95rem;
+      color: $accent-color;
+    }
+
+    .lang-text {
+      font-weight: 750;
+    }
+
+    .chevron-icon {
+      font-size: 0.65rem;
+      opacity: 0.6;
+      transition: transform 0.25s ease;
+
+      &.open {
+        transform: rotate(180deg);
       }
     }
-    @media (max-width: 767px) {
-      select {
-        padding: 0.2rem 0.3rem;
-        margin-bottom: 1rem;
-        &:focus {
-          padding: 0.2rem 0.3rem;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.02);
+      border-color: rgba(0, 0, 0, 0.15);
+      transform: scale(1.02);
+    }
+
+    &.active {
+      border-color: $accent-color;
+      box-shadow: 0 0 0 3px rgba(255, 127, 0, 0.1);
+    }
+  }
+
+  // Floating Dropdown Menu
+  .lang-dropdown-menu {
+    position: absolute;
+    top: 125%;
+    right: 0;
+    width: 150px;
+    background: #fff;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    padding: 0.5rem;
+    margin: 0;
+    list-style: none;
+    z-index: 1100;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    animation: fade-slide-in 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+    .lang-option {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.6rem 0.75rem;
+      font-size: 0.88rem;
+      font-weight: 600;
+      border: none;
+      background: transparent;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s ease;
+      color: #333; // Explicitly set text color for light mode unselected state
+
+      .option-name {
+        transition: transform 0.2s ease;
+      }
+
+      .check-mark {
+        color: $accent-color;
+        font-weight: 800;
+      }
+
+      &:hover {
+        background-color: rgba(255, 127, 0, 0.08);
+        color: $accent-color;
+
+        .option-name {
+          transform: translateX(3px);
         }
+      }
+
+      &.selected {
+        color: $accent-color;
+        background-color: rgba(255, 127, 0, 0.04);
+        font-weight: 750;
       }
     }
   }
 }
 
-%languageSelector-dark {
-  @extend %languageSelector-light;
-  .control-label {
-    color: $font-color-dark;
+// Dropdown animation
+@keyframes fade-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
   }
-  .language-selector {
-    select {
-      color: $font-color-light;
-      background-color: $accent-color-dark;
-      &:focus {
-        background-color: $secondary-color-dark;
-        border: 1px solid $accent-color-dark;
-        color: $accent-color-dark;
-        .options {
-          background-color: $secondary-color-dark;
-          border: 1px solid $accent-color-dark;
-          color: $accent-color-dark;
-        }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Light vs Dark Styles
+.navbar-wrapper.light {
+  .lang-btn {
+    color: #333;
+    border-color: rgba(0, 0, 0, 0.12);
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.03);
+    }
+  }
+}
+
+.navbar-wrapper.dark {
+  .lang-btn {
+    color: #eee;
+    border-color: rgba(255, 255, 255, 0.15);
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+  }
+
+  .lang-dropdown-menu {
+    background: #1e1a17;
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+
+    .lang-option {
+      color: #ccc;
+
+      &:hover {
+        background-color: rgba(255, 127, 0, 0.15);
+        color: $accent-color;
+      }
+
+      &.selected {
+        color: $accent-color;
+        background-color: rgba(255, 127, 0, 0.1);
       }
     }
   }
+}
+
+// Media Queries
+@media (max-width: 1024px) {
+  .language-selector-custom {
+    .lang-btn {
+      padding: 0.35rem 0.75rem;
+      font-size: 0.85rem;
+    }
+  }
+}
+
+// Placeholders to support extends in other layout files (e.g., FormLayout.scss)
+%languageSelector-light {
+  // empty placeholder
+}
+%languageSelector-dark {
+  // empty placeholder
 }

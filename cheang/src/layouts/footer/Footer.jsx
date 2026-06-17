@@ -1,151 +1,191 @@
 import { useTheme } from "../../context/ThemeContext";
 import { useLanguage } from "../../context/LanguageContext";
+import { Link } from "react-router-dom";
 import {
-  FaFacebook,
+  FaFacebookF,
   FaTwitter,
-  FaLinkedin,
+  FaLinkedinIn,
   FaInstagram,
-  FaWordpress,
   FaTiktok,
+  FaYoutube,
 } from "react-icons/fa";
 import "./Footer.scss";
+
+// Localized Footer Translations
+const footerTranslations = {
+  en: {
+    brandDesc: "Your trusted local marketplace for booking verified repair specialists, plumbers, electricians, and handymen.",
+    services: "Specialties",
+    quickLinks: "Quick Links",
+    contactSupport: "Contact & Support",
+    about: "About Us",
+    servicesLink: "Our Services",
+    guidelines: "Guidelines",
+    faq: "FAQs",
+    help: "Help Center",
+    contact: "Contact Us",
+    privacy: "Privacy Policy",
+    terms: "Terms of Service",
+    cookies: "Cookie Policy",
+    cancellation: "Cancellation Policy",
+    generalRepairs: "General Repairs",
+    electrical: "Electrical Services",
+    plumbing: "Plumbing Solutions",
+    renovations: "Home Renovations",
+    copyright: "All rights reserved. Powered by Visal Brathna Sophana",
+  },
+  kh: {
+    brandDesc: "ជាទីផ្សារក្នុងស្រុកដែលគួរឱ្យទុកចិត្តរបស់អ្នកសម្រាប់ការស្វែងរកជាងជំនាញជួសជុល ជាងទឹក ជាងភ្លើង និងជំនួយការជាងដែលបានបញ្ជាក់។",
+    services: "ជំនាញជួសជុល",
+    quickLinks: "តំណភ្ជាប់រហ័ស",
+    contactSupport: "ទំនាក់ទំនង និងជំនួយ",
+    about: "អំពីយើង",
+    servicesLink: "សេវាកម្មរបស់យើង",
+    guidelines: "គោលការណ៍ណែនាំ",
+    faq: "សំណួរដែលសួរញឹកញាប់",
+    help: "មជ្ឈមណ្ឌលជំនួយ",
+    contact: "ទាក់ទងមកយើង",
+    privacy: "គោលការណ៍ឯកជនភាព",
+    terms: "លក្ខខណ្ឌសេវាកម្ម",
+    cookies: "គោលការណ៍ឃុកឃី",
+    cancellation: "គោលការណ៍លុបចោល",
+    generalRepairs: "សេវាកម្មជួសជុលទូទៅ",
+    electrical: "សេវាកម្មអគ្គិសនី",
+    plumbing: "សេវាកម្មប្រព័ន្ធទឹក",
+    renovations: "កែលម្អគេហដ្ឋាន",
+    copyright: "រក្សាសិទ្ធិគ្រប់យ៉ាង។ សម្របសម្រួលដោយ វីសាល ប្រាថ្នា សុភ័ណ្ឌ",
+  },
+  zh: {
+    brandDesc: "您值得信赖的本地维修服务市场，可预订经过验证的维修专家、管道工、电工和勤杂工。",
+    services: "服务项目",
+    quickLinks: "快速链接",
+    contactSupport: "联系与支持",
+    about: "关于我们",
+    servicesLink: "我们的服务",
+    guidelines: "使用指南",
+    faq: "常见问题",
+    help: "帮助中心",
+    contact: "联系我们",
+    privacy: "隐私政策",
+    terms: "服务条款",
+    cookies: "Cookie 政策",
+    cancellation: "取消政策",
+    generalRepairs: "一般维修",
+    electrical: "电力服务",
+    plumbing: "管道解决方案",
+    renovations: "家居装修",
+    copyright: "保留所有权利。由 Visal Brathna Sophana 提供支持",
+  }
+};
 
 const Footer = () => {
   const { theme } = useTheme();
   const { language } = useLanguage();
+  const t = footerTranslations[language] || footerTranslations.en;
+  const currentYear = new Date().getFullYear();
+
   return (
-    <>
-      <div className={`footer-container ${theme} `}>
-        <div className="column">
-          <h3>Quick Links</h3>
-          <ul>
-            <li>
-              <a href="/">Guidelines</a>
-            </li>
-            <li>
-              <a href="/about">About</a>
-            </li>
-            <li>
-              <a href="/services">Services</a>
-            </li>
-            <li>
-              <a href="/help">Help</a>
-            </li>
-            <li>
-              <a href="/contact">Contact</a>
-            </li>
-            <li>
-              <a href="/faq">FAQ</a>
-            </li>
-          </ul>
-        </div>
-
-        <div className="column">
-          <h3>Filter</h3>
-          <ul>
-            <li>
-              <a href="/filter-location">Location</a>
-            </li>
-            {/* Add more filter options as needed */}
-          </ul>
-        </div>
-
-        <div className="column">
-          <h3>Popular Services</h3>
-          <ul>
-            <li>
-              <a href="/popular-service-1">Popular Service 1</a>
-            </li>
-            <li>
-              <a href="/popular-service-2">Popular Service 2</a>
-            </li>
-            <li>
-              <a href="/popular-service-3">Popular Service 3</a>
-            </li>
-          </ul>
-        </div>
-        <div className="social-icons">
-          <a
-            href="https://twitter.com"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <FaTwitter />
-          </a>
-          <a
-            href="https://facebook.com"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <FaFacebook />
-          </a>
-          <a
-            href="https://instagram.com"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <FaInstagram />
-          </a>
-          <a
-            href="https://tiktok.com"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <FaTiktok />
-          </a>
-          <a
-            href="https://tiktok.com"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <FaLinkedin />
-          </a>
-          <a
-            href="https://tiktok.com"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <FaWordpress />
-          </a>
-        </div>
-      </div>
-      <div className={`mixpanel-container ${theme}`}>
-        <div className="mixpanel-container-divider"></div>
-        <ul>
-          <li>
-            <a href="/privacy">Privacy</a>
-          </li>
-          {/* <li>
-          <a href="/pre-collection-notice">CA Pre-Collection Notice</a>
-        </li> */}
-          <li>
-            <a href="/do-not-sell">
-              Do Not Sell or Share My Personal Information
+    <footer className={`footer-wrapper ${theme}`}>
+      <div className="footer-main-content">
+        {/* Column 1: Brand Info & Socials */}
+        <div className="footer-column brand-col">
+          <h2 className="brand-logo-text">Cheang</h2>
+          <p className="brand-description">{t.brandDesc}</p>
+          <div className="social-icons-group">
+            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="social-circle">
+              <FaFacebookF />
             </a>
-          </li>
-          <li>
-            <a href="/cookies">Cookies</a>
-          </li>
-          <li>
-            <a href="/terms">Terms</a>
-          </li>
-          <li>
-            <a href="/cancellation-policy">Cancellation Policy</a>
-          </li>
-          <li>
-            <a href="/accessibility">Accessibility Tools</a>
-          </li>
-        </ul>
-      </div>
-      <div className={`copyright-container ${theme}`}>
-        <div className="copyright-container-content">
-          <p>
-            &copy; 2023 Handy. All rights reserved. Handy powered by Visal
-            Brathna Sophana
-          </p>
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="social-circle">
+              <FaTwitter />
+            </a>
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="social-circle">
+              <FaInstagram />
+            </a>
+            <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" className="social-circle">
+              <FaTiktok />
+            </a>
+            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="social-circle">
+              <FaLinkedinIn />
+            </a>
+            <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="social-circle">
+              <FaYoutube />
+            </a>
+          </div>
+        </div>
+
+        {/* Column 2: Specialties */}
+        <div className="footer-column">
+          <h3>{t.services}</h3>
+          <ul className="footer-links-list">
+            <li>
+              <Link to="/userlist/General Repairs Service">{t.generalRepairs}</Link>
+            </li>
+            <li>
+              <Link to="/userlist/Electrical Services">{t.electrical}</Link>
+            </li>
+            <li>
+              <Link to="/userlist/Plumbing Solutions Service">{t.plumbing}</Link>
+            </li>
+            <li>
+              <Link to="/userlist/Home Renovations Service">{t.renovations}</Link>
+            </li>
+          </ul>
+        </div>
+
+        {/* Column 3: Quick Links */}
+        <div className="footer-column">
+          <h3>{t.quickLinks}</h3>
+          <ul className="footer-links-list">
+            <li>
+              <Link to="/about">{t.about}</Link>
+            </li>
+            <li>
+              <Link to="/service">{t.servicesLink}</Link>
+            </li>
+            <li>
+              <Link to="/faq">{t.guidelines}</Link>
+            </li>
+            <li>
+              <Link to="/faq">{t.faq}</Link>
+            </li>
+          </ul>
+        </div>
+
+        {/* Column 4: Contact & Help */}
+        <div className="footer-column">
+          <h3>{t.contactSupport}</h3>
+          <ul className="footer-links-list">
+            <li>
+              <Link to="/faq">{t.help}</Link>
+            </li>
+            <li>
+              <Link to="/faq">{t.contact}</Link>
+            </li>
+            <li className="contact-info-item">
+              <span className="contact-label">Email:</span> support@cheang.com
+            </li>
+            <li className="contact-info-item">
+              <span className="contact-label">Phone:</span> +855 12 345 678
+            </li>
+          </ul>
         </div>
       </div>
-    </>
+
+      {/* Sub-Footer: Copyright and Legal */}
+      <div className="footer-bottom-section">
+        <div className="footer-bottom-container">
+          <div className="copyright-text">
+            <p>&copy; {currentYear} Cheang. {t.copyright}</p>
+          </div>
+          <div className="legal-links-list">
+            <Link to="/privacy">{t.privacy}</Link>
+            <Link to="/terms">{t.terms}</Link>
+            <Link to="/cookies">{t.cookies}</Link>
+            <Link to="/cancellation-policy">{t.cancellation}</Link>
+          </div>
+        </div>
+      </div>
+    </footer>
   );
 };
 
