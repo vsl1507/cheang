@@ -14,6 +14,14 @@ import DashboardPage from "./admin/page/DashboardPage";
 import ShowPieChart from "./admin/components/pieChart/ShowPieChart";
 import ConfirmPage from "./admin/page/ConfirmPage";
 import AboutPage from "./page/AboutPage";
+import GuidelinesPage from "./page/GuidelinesPage";
+import FAQPage from "./page/FAQPage";
+import HelpPage from "./page/HelpPage";
+import ContactPage from "./page/ContactPage";
+import PrivacyPage from "./page/PrivacyPage";
+import TermsPage from "./page/TermsPage";
+import CookiesPage from "./page/CookiesPage";
+import CancellationPage from "./page/CancellationPage";
 import UsersList from "./page/UsersListPage";
 import SearchFilter from "./components/searchFilter/SearchFilter";
 import ProfileUserPage from "./page/ProfileUserPage";
@@ -23,10 +31,12 @@ import AllUsersListPage from "./page/AllUsersListPage";
 import ProfileUserCurrentPage from "./page/ProfileUserCurrentPage";
 import PrivateRouteUser from "./components/privateRoutes/PrivateRouteUser";
 import ForgotPassword from "./page/ForgotPassword";
+import ScrollToTop from "./components/scrollToTop/ScrollToTop";
 
 const App = () => {
   return (
     <Router>
+      <ScrollToTop />
       <ThemeProvider>
         <LanguageProvider>
           <Routes>
@@ -38,6 +48,14 @@ const App = () => {
             <Route path="/signin" Component={SignInPage} /> */}
             <Route path="/signup-pro" Component={SignUpPro} />
             <Route path="/about" Component={AboutPage} />
+            <Route path="/guidelines" Component={GuidelinesPage} />
+            <Route path="/faq" Component={FAQPage} />
+            <Route path="/help" Component={HelpPage} />
+            <Route path="/contact" Component={ContactPage} />
+            <Route path="/privacy" Component={PrivacyPage} />
+            <Route path="/terms" Component={TermsPage} />
+            <Route path="/cookies" Component={CookiesPage} />
+            <Route path="/cancellation-policy" Component={CancellationPage} />
             <Route path="userlist/:typeservice" Component={UsersList} />
             <Route path="service" Component={AllUsersListPage} />
             <Route path="forgetpassword" Component={ForgotPassword} />

@@ -143,7 +143,7 @@ const Footer = () => {
               <Link to="/service">{t.servicesLink}</Link>
             </li>
             <li>
-              <Link to="/faq">{t.guidelines}</Link>
+              <Link to="/guidelines">{t.guidelines}</Link>
             </li>
             <li>
               <Link to="/faq">{t.faq}</Link>
@@ -156,10 +156,10 @@ const Footer = () => {
           <h3>{t.contactSupport}</h3>
           <ul className="footer-links-list">
             <li>
-              <Link to="/faq">{t.help}</Link>
+              <Link to="/help">{t.help}</Link>
             </li>
             <li>
-              <Link to="/faq">{t.contact}</Link>
+              <Link to="/contact">{t.contact}</Link>
             </li>
             <li className="contact-info-item">
               <span className="contact-label">Email:</span> support@cheang.com

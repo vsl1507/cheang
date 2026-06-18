@@ -1,11 +1,11 @@
-import FormLayout from "../layouts/FormLayout";
+import AppLayout from "../layouts/AppLayout";
 import SignUp from "../selector/formSelector/SignUp";
 
 const SignUpPage = () => {
   return (
-    <FormLayout>
+    <AppLayout>
       <SignUp />
-    </FormLayout>
+    </AppLayout>
   );
 };
 

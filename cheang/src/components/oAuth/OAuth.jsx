@@ -3,10 +3,15 @@ import { app } from "../../firebase";
 import { signInSuccess } from "../../redux/user/userSlice.js";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { FcGoogle } from "react-icons/fc";
+import { useTheme } from "../../context/ThemeContext";
+import "./OAuth.scss";
 
 const OAuth = () => {
+  const { theme } = useTheme();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const handleGoogleClick = async () => {
     try {
       const provider = new GoogleAuthProvider();
@@ -32,8 +37,16 @@ const OAuth = () => {
       console.log("could not sign in with google", error);
     }
   };
+
   return (
-    <button onClick={handleGoogleClick}>Continue with Google account</button>
+    <button
+      type="button"
+      className={`google-auth-btn ${theme}`}
+      onClick={handleGoogleClick}
+    >
+      <FcGoogle className="google-icon" />
+      <span>Continue with Google</span>
+    </button>
   );
 };
 
