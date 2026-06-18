@@ -1,132 +1,123 @@
-import bcryptjs from "bcryptjs";
-import User from "../models/user.model.js";
-import { errorHandler } from "../utils/error.js";
-import jwt from "jsonwebtoken";
+import AuthService from "../services/v1/auth/auth.service.js";
+import { createSignupSchema, createSigninSchema } from "../schemas/v1/auth/auth.schema.js";
+import ResponseUtil from "../utils/response.util.js";
 
-//Sign Up
-export const signup = async (req, res, next) => {
-  const { nameuser, email, password } = req.body;
+const authService = new AuthService();
 
-  //Util to help for nameuser and email
-  const validNameUserPattern = /^[a-zA-Z0-9\s]+$/;
-  const lowercasedEmail = email.toLowerCase();
-
-  //Name only with letter number and space
-  if (!validNameUserPattern.test(nameuser)) {
-    return next(errorHandler(400, "Invalid characters in the name"));
-  }
-
-  //Checking password
-  if (password.length < 6) {
-    return next(errorHandler(400, "Password should be at less 6"));
-  }
-  //Crypt password
-  const hashedPassword = bcryptjs.hashSync(password, 10);
-
-  //Add to new user
-  const newUser = new User({
-    nameuser,
-    email: lowercasedEmail,
-    password: hashedPassword,
+// Helper to set auth cookies
+const setAuthCookies = (res, accessToken, refreshToken) => {
+  const isProduction = process.env.NODE_ENV === "production";
+  
+  res.cookie("access_token", accessToken, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    maxAge: 60 * 60 * 1000, // 1 hour
   });
 
+  res.cookie("refresh_token", refreshToken, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  });
+};
+
+// Helper to clear auth cookies
+const clearAuthCookies = (res) => {
+  res.clearCookie("access_token");
+  res.clearCookie("refresh_token");
+};
+
+// Sign Up
+export const signup = async (req, res) => {
+  const { isValid, errors } = createSignupSchema(req.body);
+  if (!isValid) {
+    return ResponseUtil.badRequest(res, errors.join(", "));
+  }
+
   try {
-    await newUser.save();
-    res.status(201).json("User created successfully!");
+    const result = await authService.signup(req.body);
+    return ResponseUtil.handleServiceResult(res, result, 201);
   } catch (error) {
-    next(errorHandler(400, "Eamil is already used"));
+    return ResponseUtil.internalError(res, error.message);
   }
 };
 
-//Sign In
-export const signin = async (req, res, next) => {
-  const { email, password } = req.body;
+// Sign In
+export const signin = async (req, res) => {
+  const { isValid, errors } = createSigninSchema(req.body);
+  if (!isValid) {
+    return ResponseUtil.badRequest(res, errors.join(", "));
+  }
 
-  //Change email to lowercase
-  const lowercasedEmail = email.toLowerCase();
-
-  //
   try {
-    //Check Token
-    if (!process.env.JWT_SECRET) {
-      return next(errorHandler(500, "JWT secret not configured"));
+    const result = await authService.signin(req.body.email, req.body.password);
+    if (result.success && result.data) {
+      setAuthCookies(res, result.data.accessToken, result.data.refreshToken);
     }
-
-    //Check or find user with user in Database by email
-    const validUser = await User.findOne({ email: lowercasedEmail });
-    if (!validUser) return next(errorHandler(404, "Email not found!"));
-
-    //Check password correct or incorrect
-    const validPassword = bcryptjs.compareSync(password, validUser.password);
-    if (!validPassword) return next(errorHandler(401, "Wrong Password!"));
-
-    //Create token with user's ID
-    const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET);
-
-    // Destructure the user document, excluding the password
-    const { password: pass, ...rest } = validUser._doc;
-
-    //Send message
-    res
-      .cookie("access_token", token, { httpOnly: true })
-      .status(200)
-      .json({ ...rest, token });
+    return ResponseUtil.handleServiceResult(res, result);
   } catch (error) {
-    next(error);
+    return ResponseUtil.internalError(res, error.message);
   }
 };
 
-//Sign In & Up with  Google
-export const google = async (req, res, next) => {
+// Google OAuth
+export const google = async (req, res) => {
   try {
-    // Check if a user with the provided email already exists
-    const user = await User.findOne({ email: req.body.email });
-
-    if (user) {
-      // If user exists, generate a JWT token for the user and send it as a cookie
-      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-      const { password: pass, ...rest } = user._doc;
-      res
-        .cookie("access_token", token, { httpOnly: true })
-        .status(200)
-        .json({ ...rest, token });
-    } else {
-      const generatedPassword =
-        Math.random().toString(36).slice(-8) +
-        Math.random().toString(36).slice(-8);
-
-      const hashedPassword = bcryptjs.hashSync(generatedPassword, 10);
-
-      const newUser = new User({
-        nameuser: req.body.nameuser,
-        email: req.body.email,
-        password: hashedPassword,
-        avatar: req.body.photo,
-      });
-
-      await newUser.save();
-
-      const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
-      const { password: pass, ...rest } = newUser._doc;
-      res
-        .cookie("access_token", token, { httpOnly: true })
-        .status(200)
-        .json({ ...rest, token });
+    const result = await authService.googleSignIn(
+      req.body.nameuser,
+      req.body.email,
+      req.body.photo
+    );
+    if (result.success && result.data) {
+      setAuthCookies(res, result.data.accessToken, result.data.refreshToken);
     }
+    return ResponseUtil.handleServiceResult(res, result);
   } catch (error) {
-    next(error);
+    return ResponseUtil.internalError(res, error.message);
   }
 };
 
-//Sign Out
-export const signout = async (req, res, next) => {
+// Sign Out
+export const signout = async (req, res) => {
   try {
-    res.clearCookie("access_token");
-    res.status(200).json("User has been logged out!");
+    clearAuthCookies(res);
+    return ResponseUtil.success(res, null, "User has been logged out!");
   } catch (error) {
-    next(error);
+    return ResponseUtil.internalError(res, error.message);
   }
 };
 
-//Reset password
-export const resetPassword = async (req, res, next) => {};
+// Refresh Access Token
+export const refreshToken = async (req, res) => {
+  try {
+    const token = req.cookies.refresh_token || req.body.refreshToken;
+    const result = await authService.refreshToken(token);
+    if (result.success && result.data) {
+      setAuthCookies(res, result.data.accessToken, result.data.refreshToken);
+    }
+    return ResponseUtil.handleServiceResult(res, result);
+  } catch (error) {
+    return ResponseUtil.internalError(res, error.message);
+  }
+};
+
+// Get current user profile
+export const myprofile = async (req, res) => {
+  try {
+    const userId = req.user?.id || req.user?._id;
+    if (!userId) {
+      return ResponseUtil.unauthorized(res, "User context not found");
+    }
+    const result = await authService.myprofile(userId);
+    return ResponseUtil.handleServiceResult(res, result);
+  } catch (error) {
+    return ResponseUtil.internalError(res, error.message);
+  }
+};
+
+// Reset Password
+export const resetPassword = async (req, res) => {
+  return ResponseUtil.success(res, null, "Reset password email sent");
+};

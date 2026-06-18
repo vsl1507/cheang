@@ -8,7 +8,7 @@ class BasicController {
   create = async (req, res) => {
     try {
       const userId = req.user?.id || req.user?._id;
-      const result = await this.service.create(req.body, 1);
+      const result = await this.service.create(req.body, userId || null);
       return ResponseUtil.handleServiceResult(res, result, 201);
     } catch (error) {
       return ResponseUtil.internalError(res, error.message);
@@ -51,8 +51,8 @@ class BasicController {
   // Update
   update = async (req, res) => {
     try {
-      //   const userId = req.user?.id || req.user?._id;
-      const result = await this.service.update(req.params.id, req.body, 1);
+      const userId = req.user?.id || req.user?._id;
+      const result = await this.service.update(req.params.id, req.body, userId || null);
       return ResponseUtil.handleServiceResult(res, result);
     } catch (error) {
       return ResponseUtil.internalError(res, error.message);
@@ -63,7 +63,7 @@ class BasicController {
   softDelete = async (req, res) => {
     try {
       const userId = req.user?.id || req.user?._id;
-      const result = await this.service.softDelete(req.params.id, 1);
+      const result = await this.service.softDelete(req.params.id, userId || null);
       return ResponseUtil.handleServiceResult(res, result);
     } catch (error) {
       return ResponseUtil.internalError(res, error.message);
@@ -73,7 +73,8 @@ class BasicController {
   // Restore
   restore = async (req, res) => {
     try {
-      const result = await this.service.restore(req.params.id);
+      const userId = req.user?.id || req.user?._id;
+      const result = await this.service.restore(req.params.id, userId || null);
       return ResponseUtil.handleServiceResult(res, result);
     } catch (error) {
       return ResponseUtil.internalError(res, error.message);
@@ -83,7 +84,8 @@ class BasicController {
   // Permanent delete
   permanentDelete = async (req, res) => {
     try {
-      const result = await this.service.permanentDelete(req.params.id);
+      const userId = req.user?.id || req.user?._id;
+      const result = await this.service.permanentDelete(req.params.id, userId || null);
       return ResponseUtil.handleServiceResult(res, result);
     } catch (error) {
       return ResponseUtil.internalError(res, error.message);
@@ -94,7 +96,7 @@ class BasicController {
   toggleActive = async (req, res) => {
     try {
       const userId = req.user?.id || req.user?._id;
-      const result = await this.service.toggleActive(req.params.id, 1);
+      const result = await this.service.toggleActive(req.params.id, userId || null);
       return ResponseUtil.handleServiceResult(res, result);
     } catch (error) {
       return ResponseUtil.internalError(res, error.message);
@@ -124,7 +126,7 @@ class BasicController {
         return ResponseUtil.badRequest(res, "Please provide an array of IDs");
       }
 
-      const result = await this.service.bulkDelete(ids, 1);
+      const result = await this.service.bulkDelete(ids, userId || null);
       return ResponseUtil.handleServiceResult(res, result);
     } catch (error) {
       return ResponseUtil.internalError(res, error.message);
@@ -135,12 +137,13 @@ class BasicController {
   bulkRestore = async (req, res) => {
     try {
       const { ids } = req.body;
+      const userId = req.user?.id || req.user?._id;
 
       if (!ids || !Array.isArray(ids) || ids.length === 0) {
         return ResponseUtil.badRequest(res, "Please provide an array of IDs");
       }
 
-      const result = await this.service.bulkRestore(ids);
+      const result = await this.service.bulkRestore(ids, userId || null);
       return ResponseUtil.handleServiceResult(res, result);
     } catch (error) {
       return ResponseUtil.internalError(res, error.message);

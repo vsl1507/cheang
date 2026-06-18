@@ -2,11 +2,17 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+import dns from "dns";
 import authRouter from "./routes/auth.route.js";
 import userRouter from "./routes/user.route.js";
 import adminRouter from "./routes/admin.route.js";
 import serviceRouter from "./routes/serivce.route.js";
 import categoryRoutes from "./routes/v1/auth/category.route.js";
+import permissionRoutes from "./routes/v1/auth/permission.route.js";
+import roleRoutes from "./routes/v1/auth/role.route.js";
+
+// Use Google Public DNS to resolve MongoDB Atlas SRV records reliably
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
 // import cors from "cors";
 //Update
 // import http from "http";
@@ -37,6 +43,8 @@ app.use("/api/user", userRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/service", serviceRouter);
 app.use("/api/v1/categories", categoryRoutes);
+app.use("/api/v1/permissions", permissionRoutes);
+app.use("/api/v1/roles", roleRoutes);
 
 //Render deploy
 app.use(express.static(path.join(__dirname, "/client/dist")));

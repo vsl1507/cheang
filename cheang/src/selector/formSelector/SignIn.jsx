@@ -80,7 +80,7 @@ const SignIn = () => {
         dispatch(signInFailure(data.message));
         return;
       }
-      dispatch(signInSuccess(data));
+      dispatch(signInSuccess(data.data?.user || data));
       navigate("/");
     } catch (err) {
       dispatch(signInFailure(err.message));

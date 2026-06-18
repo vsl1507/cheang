@@ -1,8 +1,57 @@
 import mongoose from "mongoose";
 
 class BasicService {
-  constructor(model) {
+  constructor(model, options = {}) {
     this.model = model;
+    const modelName = model?.modelName;
+    const isLogOrNotification = ["ActivityLog", "Notification"].includes(modelName);
+    this.enableLogging = options.enableLogging !== false && !isLogOrNotification;
+    this.enableNotifications = options.enableNotifications !== false && !isLogOrNotification;
+  }
+
+  /**
+   * Helper to write an activity log entry
+   */
+  async logActivity(userId, action, targetId, description, details = null, ipAddress = null, userAgent = null) {
+    if (!this.enableLogging) return;
+    try {
+      const ActivityLog = (await import("../models/v1/activityLog.model.js")).default;
+      await ActivityLog.create({
+        userId,
+        action,
+        targetModel: this.model.modelName,
+        targetId: targetId || new mongoose.Types.ObjectId(),
+        description,
+        details,
+        ipAddress,
+        userAgent,
+        createdBy: userId,
+      });
+    } catch (error) {
+      console.error(`[BasicService] Error logging activity for ${this.model.modelName}:`, error);
+    }
+  }
+
+  /**
+   * Helper to send a notification to a user
+   */
+  async sendNotification(recipient, sender, title, message, type = "info", targetModel = null, targetId = null) {
+    try {
+      const Notification = (await import("../models/v1/notification.model.js")).default;
+      const notification = await Notification.create({
+        recipient,
+        sender,
+        title,
+        message,
+        type,
+        targetModel: targetModel || this.model.modelName,
+        targetId,
+        createdBy: sender,
+      });
+      return notification;
+    } catch (error) {
+      console.error(`[BasicService] Error sending notification for ${this.model.modelName}:`, error);
+    }
   }
 
   /**
@@ -17,6 +66,8 @@ class BasicService {
         ...data,
         createdBy: userId,
       });
+
+      await this.logActivity(userId, "CREATE", document._id, `Created new ${this.model.modelName}`, { data });
 
       return {
         success: true,
@@ -310,6 +361,8 @@ class BasicService {
 
       await document.save({ validateBeforeSave: runValidators });
 
+      await this.logActivity(userId, "UPDATE", document._id, `Updated ${this.model.modelName}`, { data });
+
       return {
         success: true,
         data: document,
@@ -358,6 +411,8 @@ class BasicService {
       }
 
       const result = await this.model.updateMany(query, updateData);
+
+      await this.logActivity(userId, "UPDATE_MANY", null, `Updated multiple ${this.model.modelName}(s)`, { query, data, matched: result.matchedCount, modified: result.modifiedCount });
 
       return {
         success: true,
@@ -413,6 +468,8 @@ class BasicService {
 
       await document.softDelete(userId);
 
+      await this.logActivity(userId, "SOFT_DELETE", document._id, `Soft deleted ${this.model.modelName}`);
+
       return {
         success: true,
         data: document,
@@ -430,9 +487,10 @@ class BasicService {
   /**
    * Restore soft deleted document
    * @param {String} id - Document ID
+   * @param {String} userId - User ID who is restoring
    * @returns {Object} Result object
    */
-  async restore(id) {
+  async restore(id, userId = null) {
     try {
       // Validate ObjectId
       if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -465,6 +523,8 @@ class BasicService {
 
       await document.restore();
 
+      await this.logActivity(userId, "RESTORE", document._id, `Restored ${this.model.modelName}`);
+
       return {
         success: true,
         data: document,
@@ -482,9 +542,10 @@ class BasicService {
   /**
    * Permanent delete (use with caution)
    * @param {String} id - Document ID
+   * @param {String} userId - User ID who is deleting
    * @returns {Object} Result object
    */
-  async permanentDelete(id) {
+  async permanentDelete(id, userId = null) {
     try {
       // Validate ObjectId
       if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -504,6 +565,8 @@ class BasicService {
           code: "NOT_FOUND",
         };
       }
+
+      await this.logActivity(userId, "PERMANENT_DELETE", document._id, `Permanently deleted ${this.model.modelName}`);
 
       return {
         success: true,
@@ -559,6 +622,8 @@ class BasicService {
         document.updatedBy = userId;
         await document.save();
       }
+
+      await this.logActivity(userId, "TOGGLE_ACTIVE", document._id, `Toggled active status of ${this.model.modelName} to ${document.isActive}`);
 
       return {
         success: true,
@@ -666,9 +731,10 @@ class BasicService {
   /**
    * Bulk restore
    * @param {Array} ids - Array of document IDs
+   * @param {String} userId - User ID who is restoring
    * @returns {Object} Result object
    */
-  async bulkRestore(ids) {
+  async bulkRestore(ids, userId = null) {
     try {
       if (!Array.isArray(ids) || ids.length === 0) {
         return {
@@ -679,7 +745,7 @@ class BasicService {
       }
 
       const results = await Promise.allSettled(
-        ids.map((id) => this.restore(id))
+        ids.map((id) => this.restore(id, userId))
       );
 
       const successful = results.filter(
@@ -731,6 +797,14 @@ class BasicService {
       const documents = await this.model.insertMany(documentsToCreate, {
         ordered: false,
       });
+
+      await this.logActivity(
+        userId,
+        "BULK_CREATE",
+        null,
+        `Bulk created ${documents.length} ${this.model.modelName}(s)`,
+        { count: documents.length }
+      );
 
       return {
         success: true,

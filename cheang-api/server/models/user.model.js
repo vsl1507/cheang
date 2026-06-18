@@ -20,6 +20,14 @@ const userSchema = new mongoose.Schema(
       default:
         "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
     },
+    role: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Role",
+    },
+    refreshToken: {
+      type: String,
+      default: "",
+    },
     admin: {
       type: Boolean,
       default: false,
@@ -106,6 +114,18 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Add query middleware to auto-populate role and nested permissions
+userSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "role",
+    populate: {
+      path: "permissions",
+      select: "name description",
+    },
+  });
+  next();
+});
 
 const User = mongoose.model("User", userSchema);
 

@@ -1,23 +1,10 @@
 @import "../../variables";
-.form-container {
-  max-width: 50%;
-  height: 71vh;
-  margin: auto;
-  display: flex;
-  flex-direction: column;
-  padding: $spacing_unit;
-  border-radius: 0.5rem;
-  box-shadow: 0 0 1rem rgba(97, 89, 89, 0.1);
-  text-align: center;
-  align-items: center;
-  justify-content: center;
-  background-color: $secondary-color-light;
-  .form-field {
-    display: flex;
-    flex-direction: column;
-    input {
-      margin: $spacing-unit 0;
-      padding: $spacing-unit;
-    }
+
+.signup-marketing-panel.admin-theme {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.2);
+  
+  .feature-icon {
+    color: #38bdf8 !important;
   }
 }

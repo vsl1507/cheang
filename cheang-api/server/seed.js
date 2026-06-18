@@ -4,6 +4,8 @@ import bcryptjs from "bcryptjs";
 import dns from "dns";
 import User from "./models/user.model.js";
 import Serivce from "./models/service.model.js";
+import Permission from "./models/v1/auth/permission.model.js";
+import Role from "./models/v1/auth/role.model.js";
 
 // Use Google Public DNS to resolve MongoDB Atlas SRV records reliably
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
@@ -31,7 +33,67 @@ async function seed() {
       { description: /Seed/i }
     ]
   });
+  await Permission.deleteMany({});
+  await Role.deleteMany({});
   console.log("Existing seed data cleared.");
+
+  // Seeding Permissions
+  console.log("Seeding Permissions...");
+  const permissionsData = [
+    { name: "user.read", description: "View user profile details and settings" },
+    { name: "user.write", description: "Modify user profile settings" },
+    { name: "service.create", description: "Create a new handyman listing" },
+    { name: "service.update", description: "Edit an existing listing" },
+    { name: "service.delete", description: "Delete a listing" },
+    { name: "category.create", description: "Create a new booking category" },
+    { name: "category.delete", description: "Permanently delete booking categories" },
+    { name: "admin.dashboard", description: "Access the admin monitoring panel" },
+  ];
+
+  const savedPermissions = {};
+  for (const perm of permissionsData) {
+    const doc = new Permission(perm);
+    const saved = await doc.save();
+    savedPermissions[perm.name] = saved._id;
+  }
+  console.log(`${Object.keys(savedPermissions).length} permissions seeded.`);
+
+  // Seeding Roles
+  console.log("Seeding Roles...");
+  const rolesData = [
+    {
+      name: "Client",
+      description: "Standard homeowner / customer",
+      permissions: [
+        savedPermissions["user.read"],
+        savedPermissions["user.write"],
+      ],
+    },
+    {
+      name: "Pro",
+      description: "Handyman and professional service provider",
+      permissions: [
+        savedPermissions["user.read"],
+        savedPermissions["user.write"],
+        savedPermissions["service.create"],
+        savedPermissions["service.update"],
+        savedPermissions["service.delete"],
+      ],
+    },
+    {
+      name: "Admin",
+      description: "Platform administrator with full permissions",
+      permissions: Object.values(savedPermissions),
+    },
+  ];
+
+  const savedRoles = {};
+  for (const r of rolesData) {
+    const doc = new Role(r);
+    const saved = await doc.save();
+    savedRoles[r.name] = saved._id;
+  }
+  console.log(`${rolesData.length} roles seeded.`);
 
   // Password hashing
   const saltRounds = 10;
@@ -46,6 +108,7 @@ async function seed() {
     email: "admin@cheang.com",
     password: adminPassword,
     avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=256&h=256",
+    role: savedRoles["Admin"],
     admin: true,
     userPro: false,
     Request: false,
@@ -61,6 +124,7 @@ async function seed() {
     email: "john@cheang.com",
     password: clientPassword,
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=256&h=256",
+    role: savedRoles["Client"],
     admin: false,
     userPro: false,
     Request: false,
@@ -73,6 +137,7 @@ async function seed() {
     email: "sokha@cheang.com",
     password: clientPassword,
     avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=256&h=256",
+    role: savedRoles["Client"],
     admin: false,
     userPro: false,
     Request: false,
@@ -90,6 +155,7 @@ async function seed() {
     email: "visal@cheang.com",
     password: proPassword,
     avatar: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=256&h=256",
+    role: savedRoles["Pro"],
     admin: false,
     userPro: true,
     Request: true,
@@ -127,6 +193,7 @@ async function seed() {
     email: "sophana@cheang.com",
     password: proPassword,
     avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=256&h=256",
+    role: savedRoles["Pro"],
     admin: false,
     userPro: true,
     Request: true,
@@ -157,6 +224,7 @@ async function seed() {
     email: "rathna@cheang.com",
     password: proPassword,
     avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=256&h=256",
+    role: savedRoles["Pro"],
     admin: false,
     userPro: true,
     Request: true,
