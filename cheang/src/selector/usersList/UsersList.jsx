@@ -15,6 +15,7 @@ import {
   FaTimes,
 } from "react-icons/fa";
 import "./UsersList.scss";
+import CustomSelect from "../../components/customSelect/CustomSelect";
 
 // Localized Directory Page Content
 const listTranslations = {
@@ -204,77 +205,52 @@ const UsersList = () => {
               {!params.typeservice && (
                 <div className="filter-group">
                   <label>{t.labelMainService}</label>
-                  <div className="select-wrapper">
-                    <FaBriefcase className="select-icon" />
-                    <select
-                      value={filterMainService}
-                      onChange={handleMainServiceChange}
-                    >
-                      <option value="">{t.all}</option>
-                      {servicesLanguage.MainService.map((main) => (
-                        <option key={main} value={main}>
-                          {main}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <CustomSelect
+                    value={filterMainService}
+                    onChange={handleMainServiceChange}
+                    options={servicesLanguage.MainService}
+                    placeholder={t.all}
+                    icon={<FaBriefcase />}
+                  />
                 </div>
               )}
 
               {/* Sub Service Select */}
               <div className="filter-group">
                 <label>{t.labelSubService}</label>
-                <div className="select-wrapper">
-                  <FaSlidersH className="select-icon" />
-                  <select
-                    value={filterSubService}
-                    onChange={(e) => setFilterSubService(e.target.value)}
-                    disabled={!filterMainService}
-                  >
-                    <option value="">{t.all}</option>
-                    {servicesLanguage.SubService[filterMainService]?.map((sub) => (
-                      <option key={sub} value={sub}>
-                        {sub}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <CustomSelect
+                  value={filterSubService}
+                  onChange={(e) => setFilterSubService(e.target.value)}
+                  options={servicesLanguage.SubService[filterMainService] || []}
+                  placeholder={t.all}
+                  icon={<FaSlidersH />}
+                  disabled={!filterMainService}
+                />
               </div>
 
               {/* Province Select */}
               <div className="filter-group">
                 <label>{t.labelProvince}</label>
-                <div className="select-wrapper">
-                  <FaMapMarkerAlt className="select-icon" />
-                  <select value={filterProvince} onChange={handleProvinceChange}>
-                    <option value="">{t.all}</option>
-                    {locationLanguage.Provinces.map((prov) => (
-                      <option key={prov} value={prov}>
-                        {prov}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <CustomSelect
+                  value={filterProvince}
+                  onChange={handleProvinceChange}
+                  options={locationLanguage.Provinces}
+                  placeholder={t.all}
+                  icon={<FaMapMarkerAlt />}
+                />
               </div>
 
               {/* City Select */}
               <div className="filter-group">
                 <label>{t.labelCity}</label>
-                <div className="select-wrapper">
-                  <FaCity className="select-icon" />
-                  <select
-                    value={filterCity}
-                    onChange={(e) => setFilterCity(e.target.value)}
-                    disabled={!filterProvince}
-                  >
-                    <option value="">{t.all}</option>
-                    {locationLanguage.Cities[filterProvince]?.map((ct) => (
-                      <option key={ct} value={ct}>
-                        {ct}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <CustomSelect
+                  value={filterCity}
+                  onChange={(e) => setFilterCity(e.target.value)}
+                  options={locationLanguage.Cities[filterProvince] || []}
+                  placeholder={t.all}
+                  icon={<FaCity />}
+                  disabled={!filterProvince}
+                />
               </div>
             </div>
           </div>

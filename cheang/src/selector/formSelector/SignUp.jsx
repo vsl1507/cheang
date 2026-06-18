@@ -7,7 +7,9 @@ import {
   FaCheckCircle, 
   FaTools, 
   FaBriefcase, 
-  FaSpinner 
+  FaSpinner,
+  FaEye,
+  FaEyeSlash
 } from "react-icons/fa";
 import { useTheme } from "../../context/ThemeContext";
 import { useLanguage } from "../../context/LanguageContext";
@@ -48,6 +50,7 @@ const SignUp = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -156,15 +159,39 @@ const SignUp = () => {
             {/* Password field */}
             <div className="input-field-group">
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 id="password"
                 value={formData.password || ""}
                 onChange={handleChange}
                 placeholder={language === "kh" ? "ពាក្យសម្ងាត់" : "Password"}
                 required
+                style={{ paddingRight: "3rem" }}
               />
               <FaLock className="input-field-icon" />
+              <button
+                type="button"
+                className="password-toggle-btn"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: "absolute",
+                  right: "1.1rem",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  background: "none",
+                  border: "none",
+                  padding: 0,
+                  cursor: "pointer",
+                  color: "#888",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  zIndex: 10
+                }}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+              </button>
             </div>
 
             {/* Submit Action */}

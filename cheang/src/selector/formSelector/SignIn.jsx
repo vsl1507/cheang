@@ -10,7 +10,9 @@ import {
   FaCheckCircle, 
   FaTools, 
   FaBriefcase, 
-  FaSpinner 
+  FaSpinner,
+  FaEye,
+  FaEyeSlash
 } from "react-icons/fa";
 import {
   signInStart,
@@ -54,6 +56,7 @@ const SignIn = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
 
   //handle change
   const handleChange = (e) => {
@@ -146,15 +149,39 @@ const SignIn = () => {
             {/* Password field */}
             <div className="input-field-group">
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 id="password"
                 value={formData.password || ""}
                 onChange={handleChange}
                 placeholder={language === "kh" ? "ពាក្យសម្ងាត់" : "Password"}
                 required
+                style={{ paddingRight: "3rem" }}
               />
               <FaLock className="input-field-icon" />
+              <button
+                type="button"
+                className="password-toggle-btn"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: "absolute",
+                  right: "1.1rem",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  background: "none",
+                  border: "none",
+                  padding: 0,
+                  cursor: "pointer",
+                  color: "#888",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  zIndex: 10
+                }}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+              </button>
             </div>
 
             {/* Submit Action */}

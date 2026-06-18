@@ -18,13 +18,14 @@ import {
 } from "../../redux/user/userSlice";
 import Label from "../../components/label/Label";
 import FormField from "../../components/formField/FormField";
-import { FaSave, FaSignOutAlt, FaTrash } from "react-icons/fa";
+import { FaSave, FaSignOutAlt, FaTrash, FaBriefcase, FaTools, FaMapMarkerAlt, FaCity } from "react-icons/fa";
 import Profile from "../../components/profile/Profile";
 import FormatDate from "../../utils/FormatDate";
 import "./SettingUser.scss";
 import { getProvincesAndCities } from "../../data/Location";
 import { getServicesAndSubServices } from "../../data/Service";
 import { useLanguage } from "../../context/LanguageContext";
+import CustomSelect from "../../components/customSelect/CustomSelect";
 import {
   getCity,
   getMainService,
@@ -307,83 +308,42 @@ const SettingUser = () => {
                 />
 
                 <div className="select">
-                  <select
-                    id="mainSerivce"
-                    name="mainSerivce"
+                  <CustomSelect
                     value={selectedMainService}
                     onChange={handleMainServiceChange}
-                  >
-                    <option value="">
-                      {getSelect(language) + " " + getMainService(language)}
-                    </option>
-                    {servicesLanguage.MainService.map((mainservice) => (
-                      <option key={mainservice} value={mainservice}>
-                        {mainservice}
-                      </option>
-                    ))}
-                  </select>
+                    options={servicesLanguage.MainService}
+                    placeholder={getSelect(language) + " " + getMainService(language)}
+                    icon={<FaBriefcase />}
+                  />
 
-                  <div>
-                    <select
-                      id="subService"
-                      name="subService"
-                      value={selectedSubService}
-                      onChange={handleSubServiceChange}
-                      disabled={!selectedMainService}
-                    >
-                      <option value="">
-                        {" "}
-                        {getSelect(language) + " " + getSubService(language)}
-                      </option>
-                      {servicesLanguage.SubService[selectedMainService]?.map(
-                        (subservice) => (
-                          <option key={subservice} value={subservice}>
-                            {subservice}
-                          </option>
-                        )
-                      )}
-                    </select>
-                  </div>
+                  <CustomSelect
+                    value={selectedSubService}
+                    onChange={handleSubServiceChange}
+                    options={servicesLanguage.SubService[selectedMainService] || []}
+                    placeholder={getSelect(language) + " " + getSubService(language)}
+                    icon={<FaTools />}
+                    disabled={!selectedMainService}
+                  />
                 </div>
-
+ 
                 {/* Select Location */}
                 <div className="select">
-                  <select
-                    id="province"
-                    name="province"
+                  <CustomSelect
                     value={selectedProvince}
                     onChange={handleProvinceChange}
-                  >
-                    <option value="">
-                      {getSelect(language) + " " + getProvince(language)}
-                    </option>
-                    {locationLanguage.Provinces.map((province) => (
-                      <option key={province} value={province}>
-                        {province}
-                      </option>
-                    ))}
-                  </select>
+                    options={locationLanguage.Provinces}
+                    placeholder={getSelect(language) + " " + getProvince(language)}
+                    icon={<FaMapMarkerAlt />}
+                  />
 
-                  <div>
-                    <select
-                      id="city"
-                      name="city"
-                      value={selectedCity}
-                      onChange={handleCityChange}
-                      disabled={!selectedProvince}
-                    >
-                      <option value="">
-                        {getSelect(language) + " " + getCity(language)}
-                      </option>
-                      {locationLanguage.Cities[selectedProvince]?.map(
-                        (city) => (
-                          <option key={city} value={city}>
-                            {city}
-                          </option>
-                        )
-                      )}
-                    </select>
-                  </div>
+                  <CustomSelect
+                    value={selectedCity}
+                    onChange={handleCityChange}
+                    options={locationLanguage.Cities[selectedProvince] || []}
+                    placeholder={getSelect(language) + " " + getCity(language)}
+                    icon={<FaCity />}
+                    disabled={!selectedProvince}
+                  />
                 </div>
 
                 <FormField

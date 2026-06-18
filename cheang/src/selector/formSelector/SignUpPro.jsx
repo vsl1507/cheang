@@ -23,6 +23,7 @@ import FormLayout from "../../layouts/FormLayout";
 import { getServicesAndSubServices } from "../../data/Service";
 import { useLanguage } from "../../context/LanguageContext";
 import { getProvincesAndCities } from "../../data/Location";
+import CustomSelect from "../../components/customSelect/CustomSelect";
 import "./SignUpPro.scss";
 import {
   getBecomePro,
@@ -293,91 +294,49 @@ const SignUpPro = () => {
 
                 {/* Service Dropdowns (Row) */}
                 <div className="form-row">
-                  <div className="input-group select-group">
-                    <select
-                      id="mainSerivce"
-                      name="mainSerivce"
+                  <div className="input-group">
+                    <CustomSelect
                       value={selectedMainService}
                       onChange={handleMainServiceChange}
-                      required
-                    >
-                      <option value="">
-                        {getSelect(language) + " " + getMainService(language)}
-                      </option>
-                      {servicesLanguage.MainService.map((mainservice) => (
-                        <option key={mainservice} value={mainservice}>
-                          {mainservice}
-                        </option>
-                      ))}
-                    </select>
-                    <FaBriefcase className="input-icon" />
+                      options={servicesLanguage.MainService}
+                      placeholder={getSelect(language) + " " + getMainService(language)}
+                      icon={<FaBriefcase />}
+                    />
                   </div>
 
-                  <div className="input-group select-group">
-                    <select
-                      id="subService"
-                      name="subService"
+                  <div className="input-group">
+                    <CustomSelect
                       value={selectedSubService}
                       onChange={handleSubServiceChange}
+                      options={servicesLanguage.SubService[selectedMainService] || []}
+                      placeholder={getSelect(language) + " " + getSubService(language)}
+                      icon={<FaTools />}
                       disabled={!selectedMainService}
-                      required
-                    >
-                      <option value="">
-                        {getSelect(language) + " " + getSubService(language)}
-                      </option>
-                      {servicesLanguage.SubService[selectedMainService]?.map(
-                        (subservice) => (
-                          <option key={subservice} value={subservice}>
-                            {subservice}
-                          </option>
-                        )
-                      )}
-                    </select>
-                    <FaTools className="input-icon" />
+                    />
                   </div>
                 </div>
 
                 {/* Location Dropdowns (Row) */}
                 <div className="form-row">
-                  <div className="input-group select-group">
-                    <select
-                      id="province"
-                      name="province"
+                  <div className="input-group">
+                    <CustomSelect
                       value={selectedProvince}
                       onChange={handleProvinceChange}
-                      required
-                    >
-                      <option value="">
-                        {getSelect(language) + " " + getProvince(language)}
-                      </option>
-                      {locationLanguage.Provinces.map((province) => (
-                        <option key={province} value={province}>
-                          {province}
-                        </option>
-                      ))}
-                    </select>
-                    <FaMapMarkerAlt className="input-icon" />
+                      options={locationLanguage.Provinces}
+                      placeholder={getSelect(language) + " " + getProvince(language)}
+                      icon={<FaMapMarkerAlt />}
+                    />
                   </div>
 
-                  <div className="input-group select-group">
-                    <select
-                      id="city"
-                      name="city"
+                  <div className="input-group">
+                    <CustomSelect
                       value={selectedCity}
                       onChange={handleCityChange}
+                      options={locationLanguage.Cities[selectedProvince] || []}
+                      placeholder={getSelect(language) + " " + getCity(language)}
+                      icon={<FaMapMarkerAlt />}
                       disabled={!selectedProvince}
-                      required
-                    >
-                      <option value="">
-                        {getSelect(language) + " " + getCity(language)}
-                      </option>
-                      {locationLanguage.Cities[selectedProvince]?.map((city) => (
-                        <option key={city} value={city}>
-                          {city}
-                        </option>
-                      ))}
-                    </select>
-                    <FaMapMarkerAlt className="input-icon" />
+                    />
                   </div>
                 </div>
 

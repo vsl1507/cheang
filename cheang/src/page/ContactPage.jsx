@@ -13,6 +13,7 @@ import {
   FaClock,
   FaCheckCircle
 } from "react-icons/fa";
+import CustomSelect from "../components/customSelect/CustomSelect";
 import "./ContactPage.scss";
 
 // Localized translations for the Contact Us Page
@@ -151,6 +152,14 @@ const ContactPage = () => {
   const { language } = useLanguage();
   const { theme } = useTheme();
 
+  const topicOptions = [
+    { value: "general", label: contactTranslations.topicGeneral[language] || contactTranslations.topicGeneral.en },
+    { value: "account", label: contactTranslations.topicAccount[language] || contactTranslations.topicAccount.en },
+    { value: "payment", label: contactTranslations.topicPayment[language] || contactTranslations.topicPayment.en },
+    { value: "provider", label: contactTranslations.topicProvider[language] || contactTranslations.topicProvider.en },
+    { value: "bug", label: contactTranslations.topicBug[language] || contactTranslations.topicBug.en }
+  ];
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -281,23 +290,16 @@ const ContactPage = () => {
                       {errors.email && <span className="field-error-text">{errors.email}</span>}
                     </div>
 
-                    <div className="input-group select-group">
-                      <select
-                        name="topic"
-                        id="topic"
+                    <div className="input-group">
+                      <CustomSelect
                         value={formData.topic}
                         onChange={handleChange}
+                        options={topicOptions}
+                        placeholder={getTranslation("topicPlaceholder")}
+                        icon={<FaTag />}
                         disabled={loading}
-                      >
-                        <option value="">{getTranslation("topicPlaceholder")}</option>
-                        <option value="general">{getTranslation("topicGeneral")}</option>
-                        <option value="account">{getTranslation("topicAccount")}</option>
-                        <option value="payment">{getTranslation("topicPayment")}</option>
-                        <option value="provider">{getTranslation("topicProvider")}</option>
-                        <option value="bug">{getTranslation("topicBug")}</option>
-                      </select>
-                      <FaTag className="input-icon" />
-                      {errors.topic && <span className="field-error-text">{errors.topic}</span>}
+                      />
+                      {errors.topic && <span className="field-error-text" style={{ display: "block" }}>{errors.topic}</span>}
                     </div>
 
                     <div className="input-group">

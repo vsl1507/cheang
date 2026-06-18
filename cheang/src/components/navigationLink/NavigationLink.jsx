@@ -1,26 +1,27 @@
+import { NavLink } from "react-router-dom";
 import { useTheme } from "../../context/ThemeContext";
-import { useLanguage } from "../../context/LanguageContext";
 import "./NavigationLink.scss";
+
 export function NavigationLink(props) {
   const { theme } = useTheme();
   const { href, value, style, onClick } = props;
   return (
-    <a
-      className={`navigationLink ${theme}`}
+    <NavLink
+      className={({ isActive }) => `navigationLink ${theme} ${isActive ? "active" : ""}`}
       style={style}
-      href={href}
+      to={href}
       onClick={onClick}
     >
       {value}
-    </a>
+    </NavLink>
   );
 }
 
 export function NavigationLinkDisabled({ value }) {
   const { theme } = useTheme();
   return (
-    <a className={`navigationLinkDisabled ${theme}`} disabled>
+    <span className={`navigationLinkDisabled ${theme}`}>
       {value}
-    </a>
+    </span>
   );
 }

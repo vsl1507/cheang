@@ -14,8 +14,10 @@ import FormLayout from "../../layouts/FormLayout";
 import { getServicesAndSubServices } from "../../data/Service";
 import { useLanguage } from "../../context/LanguageContext";
 import { getProvincesAndCities } from "../../data/Location";
+import CustomSelect from "../customSelect/CustomSelect";
 import "./SearchFilter.scss";
 import Card from "../card/Card";
+import { FaBriefcase, FaTools, FaMapMarkerAlt, FaCity } from "react-icons/fa";
 
 const SearchFilter = () => {
   const { theme } = useTheme();
@@ -187,73 +189,43 @@ const SearchFilter = () => {
                 {params.typeservice ? (
                   ""
                 ) : (
-                  <select
-                    id="mainSerivce"
-                    name="mainSerivce"
+                  <CustomSelect
                     value={selectedMainService}
                     onChange={handleMainServiceChange}
-                  >
-                    <option value="">Select Main Service</option>
-                    {servicesLanguage.MainService.map((mainservice) => (
-                      <option key={mainservice} value={mainservice}>
-                        {mainservice}
-                      </option>
-                    ))}
-                  </select>
+                    options={servicesLanguage.MainService}
+                    placeholder="Select Main Service"
+                    icon={<FaBriefcase />}
+                  />
                 )}
 
-                <div>
-                  <select
-                    id="subService"
-                    name="subService"
-                    value={selectedSubService}
-                    onChange={handleSubServiceChange}
-                    disabled={!selectedMainService} // Disable city dropdown if no province selected
-                  >
-                    <option value="">Select Sub Service</option>
-                    {servicesLanguage.SubService[selectedMainService]?.map(
-                      (subservice) => (
-                        <option key={subservice} value={subservice}>
-                          {subservice}
-                        </option>
-                      )
-                    )}
-                  </select>
-                </div>
+                <CustomSelect
+                  value={selectedSubService}
+                  onChange={handleSubServiceChange}
+                  options={servicesLanguage.SubService[selectedMainService] || []}
+                  placeholder="Select Sub Service"
+                  icon={<FaTools />}
+                  disabled={!selectedMainService}
+                />
               </div>
 
               {/* Location */}
               <div className="select">
-                <select
-                  id="province"
-                  name="province"
+                <CustomSelect
                   value={selectedProvince}
                   onChange={handleProvinceChange}
-                >
-                  <option value="">Select Province</option>
-                  {locationLanguage.Provinces.map((province) => (
-                    <option key={province} value={province}>
-                      {province}
-                    </option>
-                  ))}
-                </select>
+                  options={locationLanguage.Provinces}
+                  placeholder="Select Province"
+                  icon={<FaMapMarkerAlt />}
+                />
 
-                <div>
-                  <select
-                    id="city"
-                    name="city"
-                    value={selectedCity}
-                    onChange={handleCityChange}
-                    disabled={!selectedProvince} // Disable city dropdown if no province selected
-                  >
-                    <option value="">Select City</option>
-                    {locationLanguage.Cities[selectedProvince]?.map((city) => (
-                      <option key={city} value={city}>
-                        {city}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <CustomSelect
+                  value={selectedCity}
+                  onChange={handleCityChange}
+                  options={locationLanguage.Cities[selectedProvince] || []}
+                  placeholder="Select City"
+                  icon={<FaCity />}
+                  disabled={!selectedProvince}
+                />
               </div>
             </div>
             {error && <p>{error}</p>}

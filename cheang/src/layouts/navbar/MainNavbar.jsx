@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useLanguage } from "../../context/LanguageContext";
 import { useTheme } from "../../context/ThemeContext";
@@ -60,10 +60,10 @@ const MainNavbar = ({ page }) => {
 
         {/* Logo and Brand */}
         <div className="navbar-logo-section">
-          <Link to="/" className="logo-link">
+          <NavLink to="/" className="logo-link">
             <img src={Logo} alt="Cheang Logo" className="logo-img" />
             <span className="brand-name">Cheang</span>
-          </Link>
+          </NavLink>
         </div>
 
         {/* Navigation Links */}
@@ -85,14 +85,14 @@ const MainNavbar = ({ page }) => {
             
             <div className="dropdown-menu-list">
               {ServiceList.map((service) => (
-                <Link
+                <NavLink
                   to={`/userlist/${service.value}`}
                   className="dropdown-item-link"
                   key={service.id}
                   onClick={() => setShowMenu(false)}
                 >
                   {service.value}
-                </Link>
+                </NavLink>
               ))}
             </div>
           </div>
@@ -122,18 +122,18 @@ const MainNavbar = ({ page }) => {
             {currentUser ? (
               <div className="user-profile-group">
                 {!currentUser.userPro && (
-                  <Link to="/signup-pro" className="become-pro-pill" onClick={() => setShowMenu(false)}>
+                  <NavLink to="/signup-pro" className="become-pro-pill" onClick={() => setShowMenu(false)}>
                     {getBecomePro(language)}
-                  </Link>
+                  </NavLink>
                 )}
-                <Link to="/profile" className="avatar-link" onClick={() => setShowMenu(false)}>
+                <NavLink to="/profile" className="avatar-link" onClick={() => setShowMenu(false)}>
                   <Profile src={currentUser.avatar} />
-                </Link>
+                </NavLink>
               </div>
             ) : (
-              <Link to="/signup" className="signup-outline-btn" onClick={() => setShowMenu(false)}>
+              <NavLink to="/signup" className="signup-outline-btn" onClick={() => setShowMenu(false)}>
                 {getSignup(language)}
-              </Link>
+              </NavLink>
             )}
           </div>
         </div>

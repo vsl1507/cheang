@@ -9,6 +9,7 @@ import Card from "../components/card/Card";
 import { getServicesAndSubServices } from "../data/Service";
 import { getProvincesAndCities } from "../data/Location";
 import { getSeeMore } from "../data/wordsLanguage";
+import CustomSelect from "../components/customSelect/CustomSelect";
 import "./HomePage.scss";
 
 // Icons
@@ -361,81 +362,51 @@ const HomePage = () => {
                 {/* Main Service */}
                 <div className="form-group">
                   <label>{t.labelMainService}</label>
-                  <div className="select-wrapper">
-                    <FaBriefcase className="select-icon" />
-                    <select
-                      value={selectedMainService}
-                      onChange={handleMainServiceChange}
-                    >
-                      <option value="">{t.allServices}</option>
-                      {servicesLanguage.MainService.map((main) => (
-                        <option key={main} value={main}>
-                          {main}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <CustomSelect
+                    value={selectedMainService}
+                    onChange={handleMainServiceChange}
+                    options={servicesLanguage.MainService}
+                    placeholder={t.allServices}
+                    icon={<FaBriefcase />}
+                  />
                 </div>
 
                 {/* Sub Service */}
                 <div className="form-group">
                   <label>{t.labelSubService}</label>
-                  <div className="select-wrapper">
-                    <FaSlidersH className="select-icon" />
-                    <select
-                      value={selectedSubService}
-                      onChange={handleSubServiceChange}
-                      disabled={!selectedMainService}
-                    >
-                      <option value="">{t.allSubServices}</option>
-                      {servicesLanguage.SubService[selectedMainService]?.map(
-                        (sub) => (
-                          <option key={sub} value={sub}>
-                            {sub}
-                          </option>
-                        )
-                      )}
-                    </select>
-                  </div>
+                  <CustomSelect
+                    value={selectedSubService}
+                    onChange={handleSubServiceChange}
+                    options={servicesLanguage.SubService[selectedMainService] || []}
+                    placeholder={t.allSubServices}
+                    icon={<FaSlidersH />}
+                    disabled={!selectedMainService}
+                  />
                 </div>
 
                 {/* Province */}
                 <div className="form-group">
                   <label>{t.labelProvince}</label>
-                  <div className="select-wrapper">
-                    <FaMapMarkerAlt className="select-icon" />
-                    <select
-                      value={selectedProvince}
-                      onChange={handleProvinceChange}
-                    >
-                      <option value="">{t.allProvinces}</option>
-                      {locationLanguage.Provinces.map((prov) => (
-                        <option key={prov} value={prov}>
-                          {prov}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <CustomSelect
+                    value={selectedProvince}
+                    onChange={handleProvinceChange}
+                    options={locationLanguage.Provinces}
+                    placeholder={t.allProvinces}
+                    icon={<FaMapMarkerAlt />}
+                  />
                 </div>
 
                 {/* City */}
                 <div className="form-group">
                   <label>{t.labelCity}</label>
-                  <div className="select-wrapper">
-                    <FaCity className="select-icon" />
-                    <select
-                      value={selectedCity}
-                      onChange={handleCityChange}
-                      disabled={!selectedProvince}
-                    >
-                      <option value="">{t.allCities}</option>
-                      {locationLanguage.Cities[selectedProvince]?.map((ct) => (
-                        <option key={ct} value={ct}>
-                          {ct}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <CustomSelect
+                    value={selectedCity}
+                    onChange={handleCityChange}
+                    options={locationLanguage.Cities[selectedProvince] || []}
+                    placeholder={t.allCities}
+                    icon={<FaCity />}
+                    disabled={!selectedProvince}
+                  />
                 </div>
 
                 {/* Search Button */}

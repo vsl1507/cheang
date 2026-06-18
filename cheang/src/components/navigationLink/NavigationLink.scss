@@ -63,9 +63,32 @@
   @extend %navigationLink-Light;
   color: $accent-color-dark;
   font-weight: bold;
+  cursor: default;
 }
 .navigationLinkDisabled.dark {
   @extend %navigationLink-dark;
   color: $accent-color-dark;
   font-weight: bold;
+  cursor: default;
+}
+
+.navigationLink.light.active {
+  @extend %navigationLink-Light;
+  color: $accent-color-dark;
+  font-weight: bold;
+  
+  &:before {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+  }
+}
+.navigationLink.dark.active {
+  @extend %navigationLink-dark;
+  color: $accent-color-dark;
+  font-weight: bold;
+  
+  &:before {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+  }
 }
