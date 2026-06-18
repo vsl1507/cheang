@@ -18,7 +18,7 @@ const ConfirmPage = () => {
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
   const { currentUser } = useSelector((state) => state.user);
-  const [showDetail, setShowDetail] = useState(false);
+  const [expandedUserId, setExpandedUserId] = useState(null);
   const [confirmData, setConfirmData] = useState({
     userPro: true,
     Confirm: true,
@@ -31,8 +31,13 @@ const ConfirmPage = () => {
   });
 
   const handleShow = (userId) => {
-    setShowDetail(!showDetail);
+    if (expandedUserId === userId) {
+      setExpandedUserId(null);
+    } else {
+      setExpandedUserId(userId);
+    }
   };
+
   const handleConfirm = async (userId) => {
     try {
       setLoading(true);
@@ -75,24 +80,13 @@ const ConfirmPage = () => {
       }
       setLoading(false);
       setUsers(data);
-
       window.location.reload();
     } catch (error) {
       setError(true);
     }
   };
-  // console.log(users);
 
   useEffect(() => {
-    ///update
-    // const socket = socketIOClient("http://localhost:5000"); // Replace with your server's URL
-
-    // // Listen for updates from the server
-    // socket.on("update", (data) => {
-    //   // Update the state with the received data
-    //   setUsers(data);
-    // });
-    ///
     const fetchUser = async () => {
       setLoading(true);
       const res = await fetch("/api/admin/usersreq");
@@ -105,72 +99,77 @@ const ConfirmPage = () => {
     };
 
     fetchUser();
-    // ///Update
-    // return () => {
-    //   socket.disconnect(); // Disconnect the socket when the component unmounts
-    // };
-    // //
   }, [currentUser]);
 
   return (
     <AdminAppLayout>
       <div className="confirm-contain">
-        <Label label="Comfirm" />
+        <Label label="Confirm Professional Accounts" />
         <div className="confirm-container">
-          {loading && <div>Loading...</div>}
-          {error && <div>Error: {error}</div>}
+          {loading && <div className="loading-state">Loading...</div>}
+          {error && <div className="error-state">Error: {error}</div>}
           {!loading && !error && (
             <>
-              {users.map((user) => (
-                <div className="list-user" key={user._id}>
-                  <div className="user-confirm" key={user._id}>
-                    <img src={user.avatar} alt={user.name} />
-                    <div className="user-confirm-name">
-                      <p>
-                        <FaUser style={{ marginRight: "8px" }} /> Ower:{" "}
-                        {user.nameuser}
-                      </p>
-                      <p>
-                        <FaWrench style={{ marginRight: "8px" }} /> Brand Name:{" "}
-                        {user.brandName}
-                      </p>
-                      <p>
-                        <FaLocationArrow style={{ marginRight: "8px" }} />
-                        Location: {user.brandName}
-                      </p>
-                    </div>
-                    <div className="user-button">
-                      <button onClick={() => handleConfirm(user._id)}>
-                        Confirm
-                      </button>
-                      <button onClick={() => handleReject(user._id)}>
-                        Reject
-                      </button>
-                    </div>
-                  </div>
-                  <div>
-                    {showDetail ? (
-                      <div className="user-show">
-                        <div className="user-detail">
-                          <p>Detail: {user.brandName}</p>
-                        </div>
-                        <div className="user-confirm-detail">
-                          <p>Type Service: {user.typeService}</p>
-                          <p>Phone : {user.phone}</p>
-                          <p>Location : {user.location}</p>
-                        </div>
-                        <button onClick={() => handleShow(user._id)}>
-                          See more <FaArrowUp style={{ fontSize: "12px" }} />
+              {users.length === 0 ? (
+                <div className="empty-state-card">
+                  <p>No handyman requests pending confirmation.</p>
+                </div>
+              ) : (
+                users.map((user) => (
+                  <div className="list-user" key={user._id}>
+                    <div className="user-confirm">
+                      <img src={user.avatar} alt={user.nameuser} />
+                      <div className="user-confirm-name">
+                        <p>
+                          <FaUser style={{ marginRight: "8px" }} />
+                          Owner: <strong>{user.nameuser}</strong>
+                        </p>
+                        <p>
+                          <FaWrench style={{ marginRight: "8px" }} />
+                          Brand Name: <strong>{user.brandName}</strong>
+                        </p>
+                        <p>
+                          <FaLocationArrow style={{ marginRight: "8px" }} />
+                          Location: <strong>{user.city || "N/A"}, {user.province || "N/A"}</strong>
+                        </p>
+                      </div>
+                      <div className="user-button">
+                        <button onClick={() => handleConfirm(user._id)}>
+                          Confirm
+                        </button>
+                        <button onClick={() => handleReject(user._id)}>
+                          Reject
                         </button>
                       </div>
-                    ) : (
-                      <button onClick={handleShow}>
-                        See more <FaArrowDown style={{ fontSize: "12px" }} />
-                      </button>
-                    )}
+                    </div>
+                    <div>
+                      {expandedUserId === user._id ? (
+                        <div className="user-show">
+                          <div className="user-detail">
+                            <p><strong>Description:</strong> {user.brandName || "No description provided."}</p>
+                          </div>
+                          <div className="user-confirm-detail">
+                            <p><strong>Type Service:</strong> {user.typeService || "N/A"}</p>
+                            <p><strong>Phone:</strong> {user.phone || "N/A"}</p>
+                            <p><strong>Location:</strong> {user.city || "N/A"}, {user.province || "N/A"}</p>
+                          </div>
+                          <div className="see-more-btn-container">
+                            <button className="see-more-toggle" onClick={() => handleShow(user._id)}>
+                              See Less <FaArrowUp style={{ fontSize: "12px" }} />
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="see-more-btn-container">
+                          <button className="see-more-toggle" onClick={() => handleShow(user._id)}>
+                            See More <FaArrowDown style={{ fontSize: "12px" }} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </>
           )}
         </div>

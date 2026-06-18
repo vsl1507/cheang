@@ -19,7 +19,7 @@ import {
   updateUserStart,
   updateUserSuccess,
 } from "../../redux/user/userSlice";
-import FormLayout from "../../layouts/FormLayout";
+import AppLayout from "../../layouts/AppLayout";
 import { getServicesAndSubServices } from "../../data/Service";
 import { useLanguage } from "../../context/LanguageContext";
 import { getProvincesAndCities } from "../../data/Location";
@@ -216,7 +216,7 @@ const SignUpPro = () => {
   }
 
   return (
-    <FormLayout>
+    <AppLayout>
       {currentUser.userPro ? (
         <div className={`signup-pro-page ${theme}`}>
           <div className="already-pro-panel">
@@ -370,7 +370,7 @@ const SignUpPro = () => {
           </div>
         </div>
       )}
-    </FormLayout>
+    </AppLayout>
   );
 };
 
