@@ -1,93 +1,294 @@
 import express from "express";
 import categoryController from "../../../controllers/v1/auth/category.controller.js";
-// import { authenticate, authorize } from "../middlewares/auth.middleware.js"; // Uncomment when you have auth
+import { verifyToken } from "../../../utils/verifyUser.js";
 
 const router = express.Router();
 
-// Public routes (or add authentication as needed)
 /**
- * @route   GET /api/categories/active
- * @desc    Get all active categories
- * @access  Public
+ * @swagger
+ * /api/v1/categories/active:
+ *   get:
+ *     summary: Retrieve list of all active categories
+ *     tags: [Categories]
+ *     responses:
+ *       200:
+ *         description: Active categories list retrieved successfully
  */
 router.get("/active", categoryController.getActive);
 
 /**
- * @route   GET /api/categories/stats
- * @desc    Get category statistics
- * @access  Private/Admin
+ * @swagger
+ * /api/v1/categories/stats:
+ *   get:
+ *     summary: Get category statistics reports
+ *     tags: [Categories]
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Statistics report (total, active, inactive, deleted counts)
  */
-router.get("/stats", categoryController.getStats);
+router.get("/stats", verifyToken, categoryController.getStats);
 
 /**
- * @route   GET /api/categories
- * @desc    Get all categories with pagination
- * @access  Private
- * @query   page, limit, sort, search, status, includeDeleted
+ * @swagger
+ * /api/v1/categories:
+ *   get:
+ *     summary: Get all categories with pagination, search, and status filters
+ *     tags: [Categories]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Search by nameEn, nameKh, nameZh, description
+ *       - in: query
+ *         name: includeDeleted
+ *         schema:
+ *           type: boolean
+ *           default: false
+ *     responses:
+ *       200:
+ *         description: Categories retrieved successfully
  */
 router.get("/", categoryController.getAll);
 
 /**
- * @route   GET /api/categories/:id
- * @desc    Get category by ID
- * @access  Private
+ * @swagger
+ * /api/v1/categories/{id}:
+ *   get:
+ *     summary: Get category details by ID
+ *     tags: [Categories]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Category details object
+ *       404:
+ *         description: Category not found
  */
 router.get("/:id", categoryController.getById);
 
 /**
- * @route   POST /api/categories
- * @desc    Create new category
- * @access  Private
+ * @swagger
+ * /api/v1/categories:
+ *   post:
+ *     summary: Create a new category
+ *     tags: [Categories]
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - nameEn
+ *               - nameKh
+ *               - nameZh
+ *             properties:
+ *               nameEn:
+ *                 type: string
+ *                 example: Plumbing
+ *               nameKh:
+ *                 type: string
+ *                 example: ជួសជុលទុយោទឹក
+ *               nameZh:
+ *                 type: string
+ *                 example: 水管维修
+ *               description:
+ *                 type: string
+ *                 example: Plumbing repair services
+ *     responses:
+ *       201:
+ *         description: Category created successfully
+ *       400:
+ *         description: Validation error
  */
-router.post("/", categoryController.create);
+router.post("/", verifyToken, categoryController.create);
 
 /**
- * @route   PUT /api/categories/:id
- * @desc    Update category
- * @access  Private
+ * @swagger
+ * /api/v1/categories/{id}:
+ *   put:
+ *     summary: Update category by ID
+ *     tags: [Categories]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nameEn:
+ *                 type: string
+ *               nameKh:
+ *                 type: string
+ *               nameZh:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Category updated successfully
  */
-router.put("/:id", categoryController.update);
+router.put("/:id", verifyToken, categoryController.update);
 
 /**
- * @route   PATCH /api/categories/:id/toggle-active
- * @desc    Toggle category active status
- * @access  Private
+ * @swagger
+ * /api/v1/categories/{id}/toggle-active:
+ *   patch:
+ *     summary: Toggle active status of a category
+ *     tags: [Categories]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Category active status toggled successfully
  */
-router.patch("/:id/toggle-active", categoryController.toggleActive);
+router.patch("/:id/toggle-active", verifyToken, categoryController.toggleActive);
 
 /**
- * @route   DELETE /api/categories/:id/soft
- * @desc    Soft delete category
- * @access  Private
+ * @swagger
+ * /api/v1/categories/{id}/soft:
+ *   delete:
+ *     summary: Soft delete a category
+ *     tags: [Categories]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Category soft deleted successfully
  */
-router.delete("/:id/soft", categoryController.softDelete);
+router.delete("/:id/soft", verifyToken, categoryController.softDelete);
 
 /**
- * @route   PATCH /api/categories/:id/restore
- * @desc    Restore soft deleted category
- * @access  Private
+ * @swagger
+ * /api/v1/categories/{id}/restore:
+ *   patch:
+ *     summary: Restore a soft-deleted category
+ *     tags: [Categories]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Category restored successfully
  */
-router.patch("/:id/restore", categoryController.restore);
+router.patch("/:id/restore", verifyToken, categoryController.restore);
 
 /**
- * @route   DELETE /api/categories/:id/permanent
- * @desc    Permanently delete category
- * @access  Private/Admin
+ * @swagger
+ * /api/v1/categories/{id}/permanent:
+ *   delete:
+ *     summary: Permanently delete a category
+ *     tags: [Categories]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Category permanently deleted
  */
-router.delete("/:id/permanent", categoryController.permanentDelete);
+router.delete("/:id/permanent", verifyToken, categoryController.permanentDelete);
 
 /**
- * @route   POST /api/categories/bulk-delete
- * @desc    Bulk soft delete categories
- * @access  Private
+ * @swagger
+ * /api/v1/categories/bulk-delete:
+ *   post:
+ *     summary: Bulk soft delete categories
+ *     tags: [Categories]
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - ids
+ *             properties:
+ *               ids:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       200:
+ *         description: Categories bulk soft deleted
  */
-router.post("/bulk-delete", categoryController.bulkDelete);
+router.post("/bulk-delete", verifyToken, categoryController.bulkDelete);
 
 /**
- * @route   POST /api/categories/bulk-restore
- * @desc    Bulk restore categories
- * @access  Private
+ * @swagger
+ * /api/v1/categories/bulk-restore:
+ *   post:
+ *     summary: Bulk restore soft-deleted categories
+ *     tags: [Categories]
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - ids
+ *             properties:
+ *               ids:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       200:
+ *         description: Categories bulk restored
  */
-router.post("/bulk-restore", categoryController.bulkRestore);
+router.post("/bulk-restore", verifyToken, categoryController.bulkRestore);
 
 export default router;

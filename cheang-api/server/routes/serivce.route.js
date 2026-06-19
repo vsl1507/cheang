@@ -1,20 +1,12 @@
 import express from "express";
 import { verifyToken } from "../utils/verifyUser.js";
-import {
-  createService,
-  deleteService,
-  updateService,
-  getService,
-  // getServiceUser,
-} from "../controllers/service.controllers.js";
-import { getUserService } from "../controllers/user.controllers.js";
+import serviceController from "../controllers/v1/service.controller.js";
 
 const serviceRouter = express.Router();
 
-serviceRouter.post("/create", verifyToken, createService);
-serviceRouter.delete("/delete/:id", verifyToken, deleteService);
-serviceRouter.post("/update/:id", verifyToken, updateService);
-serviceRouter.get("/get/:id", getService);
-// serviceRouter.get("/getServices/:id", getServiceUser);
+serviceRouter.post("/create", verifyToken, serviceController.create);
+serviceRouter.delete("/delete/:id", verifyToken, serviceController.delete);
+serviceRouter.post("/update/:id", verifyToken, serviceController.update);
+serviceRouter.get("/get/:id", serviceController.getById);
 
 export default serviceRouter;

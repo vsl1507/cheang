@@ -1,51 +1,34 @@
 import express from "express";
-import {
-  test,
-  updateUser,
-  deleteUser,
-  getUserService,
-  getAllUserAc,
-  getUser,
-  getServiceUser,
-  getUserno,
-  getAllUser,
-  updateUserPro,
-  countUsers,
-  ratingUser,
-  commentUser,
-  deleteCommentUser,
-  saveUser,
-  searchUsers,
-  liveSearch,
-  createSupportMessage,
-} from "../controllers/user.controllers.js";
+import userController from "../controllers/v1/user.controller.js";
+import supportMessageController from "../controllers/v1/supportMessage.controller.js";
+import serviceController from "../controllers/v1/service.controller.js";
 import { verifyToken } from "../utils/verifyUser.js";
 
 const userRouter = express.Router();
-userRouter.post("/support-message", createSupportMessage);
-userRouter.get("/test", test);
-userRouter.delete("/delete/:id", verifyToken, deleteUser);
-userRouter.get("/services/:id", verifyToken, getUserService);
-userRouter.get("/getuser/:id", verifyToken, getUser);
-// userRouter.get("/getalluser/", getAllUser);
-userRouter.get("/service/:id", getServiceUser);
-userRouter.get("/getuserno/:id", getUserno);
 
-//With token
-userRouter.get("/getalluserac/", verifyToken, getAllUserAc);
-userRouter.post("/update/:id", verifyToken, updateUser);
-userRouter.post("/rating/:id", verifyToken, ratingUser);
-userRouter.post("/comment/:id", verifyToken, commentUser);
-userRouter.delete("/deletecomment/:commentId", verifyToken, deleteCommentUser);
-userRouter.post("/save/:userId", verifyToken, saveUser);
-userRouter.get("/search", verifyToken, searchUsers);
-userRouter.get("/live-search", verifyToken, liveSearch);
+userRouter.post("/support-message", supportMessageController.create);
+userRouter.get("/test", (req, res) => res.status(201).json("User created successfully"));
+userRouter.delete("/delete/:id", verifyToken, userController.delete);
+userRouter.get("/services/:id", verifyToken, serviceController.getUserService);
+userRouter.get("/getuser/:id", verifyToken, userController.getUser);
+userRouter.get("/service/:id", serviceController.getServiceUser);
+userRouter.get("/getuserno/:id", userController.getUser);
 
-//To admin
-userRouter.post("/updateconfirm/:id", verifyToken, updateUserPro);
-userRouter.get("/countusers", verifyToken, countUsers);
+// With token
+userRouter.get("/getalluserac/", verifyToken, userController.getAllUserAc);
+userRouter.post("/update/:id", verifyToken, userController.update);
+userRouter.post("/rating/:id", verifyToken, userController.ratingUser);
+userRouter.post("/comment/:id", verifyToken, userController.commentUser);
+userRouter.delete("/deletecomment/:commentId", verifyToken, userController.deleteCommentUser);
+userRouter.post("/save/:userId", verifyToken, userController.saveUser);
+userRouter.get("/search", verifyToken, userController.searchUsers);
+userRouter.get("/live-search", userController.liveSearch);
 
-//Wihotu token
-userRouter.get("/getalluser/", getAllUser);
+// To admin
+userRouter.post("/updateconfirm/:id", verifyToken, userController.update);
+userRouter.get("/countusers", verifyToken, userController.getAllUser);
+
+// Without token
+userRouter.get("/getalluser/", userController.getAllUser);
 
 export default userRouter;

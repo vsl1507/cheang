@@ -13,6 +13,7 @@ import {
   deleteSupportMessage,
   editUserByAdmin,
   resetUserPasswordByAdmin,
+  getTransactions,
 } from "../controllers/admin.controllers.js";
 
 const adminRouter = express.Router();
@@ -29,5 +30,6 @@ adminRouter.put("/support-messages/:id", verifyToken, verifyAdmin, updateSupport
 adminRouter.delete("/support-messages/:id", verifyToken, verifyAdmin, deleteSupportMessage);
 adminRouter.put("/edit-user/:id", verifyToken, verifyAdmin, editUserByAdmin);
 adminRouter.put("/reset-password/:id", verifyToken, verifyAdmin, resetUserPasswordByAdmin);
+adminRouter.get("/transactions", verifyToken, verifyAdmin, getTransactions);
 
 export default adminRouter;

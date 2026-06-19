@@ -8,6 +8,9 @@ import Permission from "./models/v1/auth/permission.model.js";
 import Role from "./models/v1/auth/role.model.js";
 import Booking from "./models/booking.model.js";
 import SupportMessage from "./models/supportMessage.model.js";
+import Review from "./models/review.model.js";
+import Save from "./models/save.model.js";
+import Transaction from "./models/transaction.model.js";
 
 // Use Google Public DNS to resolve MongoDB Atlas SRV records reliably
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
@@ -39,6 +42,9 @@ async function seed() {
   await Role.deleteMany({});
   await Booking.deleteMany({});
   await SupportMessage.deleteMany({});
+  await Review.deleteMany({});
+  await Save.deleteMany({});
+  await Transaction.deleteMany({});
   console.log("Existing seed data cleared.");
 
   // Seeding Permissions
@@ -169,27 +175,24 @@ async function seed() {
     subService: "Troubleshooting electrical problem",
     phone: "+855 12 888 999",
     province: "Phnom Penh",
-    city: "Chamkar Mon",
-    ratings: [
-      { userRate: savedClient1._id.toString(), rating: 5 },
-      { userRate: savedClient2._id.toString(), rating: 4 }
-    ],
-    comments: [
-      {
-        userComment: savedClient1._id.toString(),
-        userName: savedClient1.nameuser,
-        userAvatar: savedClient1.avatar,
-        comment: "Excellent response time! Diagnosed and repaired my home wiring issue in under an hour."
-      },
-      {
-        userComment: savedClient2._id.toString(),
-        userName: savedClient2.nameuser,
-        userAvatar: savedClient2.avatar,
-        comment: "Very professional electrician. Arrived on time and was very tidy."
-      }
-    ]
+    city: "Chamkar Mon"
   });
   const savedPro1 = await pro1.save();
+
+  await Review.create([
+    {
+      client: savedClient1._id,
+      handyman: savedPro1._id,
+      rating: 5,
+      comment: "Excellent response time! Diagnosed and repaired my home wiring issue in under an hour."
+    },
+    {
+      client: savedClient2._id,
+      handyman: savedPro1._id,
+      rating: 4,
+      comment: "Very professional electrician. Arrived on time and was very tidy."
+    }
+  ]);
 
   // Pro 2: Plumber in Siem Reap
   const pro2 = new User({
@@ -207,20 +210,18 @@ async function seed() {
     subService: "Fixing leaks service",
     phone: "+855 87 654 321",
     province: "Siem Reap",
-    city: "Siem Reap",
-    ratings: [
-      { userRate: savedClient1._id.toString(), rating: 5 }
-    ],
-    comments: [
-      {
-        userComment: savedClient1._id.toString(),
-        userName: savedClient1.nameuser,
-        userAvatar: savedClient1.avatar,
-        comment: "Fixed our leaky kitchen pipes perfectly. Fair pricing and transparent estimate."
-      }
-    ]
+    city: "Siem Reap"
   });
   const savedPro2 = await pro2.save();
+
+  await Review.create([
+    {
+      client: savedClient1._id,
+      handyman: savedPro2._id,
+      rating: 5,
+      comment: "Fixed our leaky kitchen pipes perfectly. Fair pricing and transparent estimate."
+    }
+  ]);
 
   // Pro 3: General Repairer in Phnom Penh
   const pro3 = new User({
@@ -238,20 +239,32 @@ async function seed() {
     subService: "Repairing walls Service",
     phone: "+855 99 777 555",
     province: "Phnom Penh",
-    city: "Toul Kork",
-    ratings: [
-      { userRate: savedClient2._id.toString(), rating: 5 }
-    ],
-    comments: [
-      {
-        userComment: savedClient2._id.toString(),
-        userName: savedClient2.nameuser,
-        userAvatar: savedClient2.avatar,
-        comment: "Repaired the drywall damages in my living room. Smooth, matching finish. Outstanding work!"
-      }
-    ]
+    city: "Toul Kork"
   });
   const savedPro3 = await pro3.save();
+
+  await Review.create([
+    {
+      client: savedClient2._id,
+      handyman: savedPro3._id,
+      rating: 5,
+      comment: "Repaired the drywall damages in my living room. Smooth, matching finish. Outstanding work!"
+    }
+  ]);
+
+  console.log("Seeding platform saves/bookmarks...");
+  await Save.create([
+    {
+      userSaver: savedClient1._id,
+      userSaved: savedPro1._id,
+      saveSign: true
+    },
+    {
+      userSaver: savedClient1._id,
+      userSaved: savedPro2._id,
+      saveSign: true
+    }
+  ]);
 
   console.log(`Pros created: ${savedPro1.email}, ${savedPro2.email}, ${savedPro3.email}`);
 
@@ -320,11 +333,38 @@ async function seed() {
     },
   ];
 
+  const savedBookings = [];
   for (const b of bookings) {
     const newBooking = new Booking(b);
-    await newBooking.save();
+    const saved = await newBooking.save();
+    savedBookings.push(saved);
   }
   console.log("Bookings seeded successfully!");
+
+  // Seed Transactions for Completed and Accepted Bookings
+  console.log("Seeding booking transactions...");
+  await Transaction.create([
+    {
+      booking: savedBookings[0]._id, // completed wiring booking
+      payer: savedClient1._id,
+      payee: savedPro1._id,
+      amount: 45,
+      currency: "USD",
+      paymentMethod: "Stripe",
+      status: "Completed",
+      transactionRef: "ch_stripe_12345abcde"
+    },
+    {
+      booking: savedBookings[1]._id, // accepted leak repair booking
+      payer: savedClient2._id,
+      payee: savedPro2._id,
+      amount: 35,
+      currency: "USD",
+      paymentMethod: "ABA",
+      status: "Completed",
+      transactionRef: "aba_pay_54321xyz"
+    }
+  ]);
 
   // Seeding Support Messages
   console.log("Seeding platform support messages...");

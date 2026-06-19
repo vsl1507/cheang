@@ -4,6 +4,54 @@ import Role from "../../../models/v1/auth/role.model.js";
 import Permission from "../../../models/v1/auth/permission.model.js";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
+import Review from "../../../models/review.model.js";
+import Save from "../../../models/save.model.js";
+
+async function populateUserCommentsAndSaves(userObj) {
+  if (!userObj) return null;
+  const userId = userObj._id;
+
+  const reviews = await Review.find({ handyman: userId })
+    .populate("client", "nameuser avatar")
+    .sort({ createdAt: -1 });
+
+  const formattedRatings = reviews.map(r => ({
+    _id: r._id,
+    userRate: r.client ? r.client._id.toString() : "",
+    rating: r.rating
+  }));
+
+  const formattedComments = reviews
+    .filter(r => r.comment && r.comment.trim() !== "")
+    .map(r => ({
+      _id: r._id,
+      userComment: r.client ? r.client._id.toString() : "",
+      userName: r.client ? r.client.nameuser : "",
+      userAvatar: r.client ? r.client.avatar : "",
+      comment: r.comment,
+      createdAt: r.createdAt,
+      updatedAt: r.updatedAt
+    }));
+
+  const saves = await Save.find({ userSaver: userId })
+    .populate("userSaved", "nameuser avatar");
+
+  const formattedSaves = saves.map(s => ({
+    _id: s._id,
+    userId: s.userSaved ? s.userSaved._id.toString() : "",
+    userName: s.userSaved ? s.userSaved.nameuser : "",
+    userAvatar: s.userSaved ? s.userSaved.avatar : "",
+    saveSign: s.saveSign,
+    createdAt: s.createdAt,
+    updatedAt: s.updatedAt
+  }));
+
+  userObj.ratings = formattedRatings;
+  userObj.comments = formattedComments;
+  userObj.saves = formattedSaves;
+
+  return userObj;
+}
 
 class AuthService extends BasicService {
   constructor() {
@@ -92,14 +140,20 @@ class AuthService extends BasicService {
       const refreshToken = jwt.sign({ id: user._id }, refreshSecret, { expiresIn: "7d" });
 
       // Save refresh token to user
-      user.refreshToken = refreshToken;
+      user.refreshTokens = user.refreshTokens || [];
+      user.refreshTokens.push(refreshToken);
+      if (user.refreshTokens.length > 5) {
+        user.refreshTokens.shift();
+      }
       await user.save();
 
       // Log Login Activity manually since login is not a standard service write operation
       await this.logActivity(user._id, "LOGIN", user._id, `User ${user.email} logged in successfully`);
 
       // Remove password from output
-      const { password: pass, refreshToken: rt, ...userWithoutPassword } = user.toObject();
+      const userObj = user.toObject();
+      const populatedUser = await populateUserCommentsAndSaves(userObj);
+      const { password: pass, refreshTokens: rt, ...userWithoutPassword } = populatedUser;
 
       return {
         success: true,
@@ -162,13 +216,19 @@ class AuthService extends BasicService {
       const accessToken = jwt.sign({ id: user._id }, secret, { expiresIn: "1h" });
       const refreshToken = jwt.sign({ id: user._id }, refreshSecret, { expiresIn: "7d" });
 
-      user.refreshToken = refreshToken;
+      user.refreshTokens = user.refreshTokens || [];
+      user.refreshTokens.push(refreshToken);
+      if (user.refreshTokens.length > 5) {
+        user.refreshTokens.shift();
+      }
       await user.save();
 
       // Log Login Activity
       await this.logActivity(user._id, isNewUser ? "GOOGLE_SIGNUP" : "GOOGLE_LOGIN", user._id, `User ${user.email} authenticated via Google`);
 
-      const { password: pass, refreshToken: rt, ...userWithoutPassword } = user.toObject();
+      const userObj = user.toObject();
+      const populatedUser = await populateUserCommentsAndSaves(userObj);
+      const { password: pass, refreshTokens: rt, ...userWithoutPassword } = populatedUser;
 
       return {
         success: true,
@@ -217,7 +277,7 @@ class AuthService extends BasicService {
       }
 
       // Find user with matching ID and refresh token
-      const user = await this.model.findOne({ _id: payload.id, refreshToken: token });
+      const user = await this.model.findOne({ _id: payload.id, refreshTokens: token });
       if (!user) {
         return {
           success: false,
@@ -232,7 +292,8 @@ class AuthService extends BasicService {
       const newRefreshToken = jwt.sign({ id: user._id }, refreshSecret, { expiresIn: "7d" });
 
       // Rotate refresh token
-      user.refreshToken = newRefreshToken;
+      user.refreshTokens = user.refreshTokens.filter(t => t !== token);
+      user.refreshTokens.push(newRefreshToken);
       await user.save();
 
       return {
@@ -262,7 +323,9 @@ class AuthService extends BasicService {
     const result = await this.getById(userId);
     if (result.success && result.data) {
       // Remove password from user profile output
-      const { password, refreshToken, ...userWithoutSensitive } = result.data.toObject();
+      const userObj = result.data.toObject();
+      const populatedUser = await populateUserCommentsAndSaves(userObj);
+      const { password, refreshToken, ...userWithoutSensitive } = populatedUser;
       return {
         success: true,
         data: userWithoutSensitive,

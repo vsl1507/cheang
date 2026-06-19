@@ -20,7 +20,7 @@ export const deleteService = async (req, res, next) => {
     return next(errorHandler(404, "Listing not found!"));
   }
 
-  if (req.user.id !== serivce.userRef) {
+  if (req.user.id !== serivce.userRef.toString()) {
     return next(errorHandler(401, "You can only delete your own listings!"));
   }
 
@@ -38,7 +38,7 @@ export const updateService = async (req, res, next) => {
   if (!serivce) {
     return next(errorHandler(404, "Listing not found!"));
   }
-  if (req.user.id !== serivce.userRef) {
+  if (req.user.id !== serivce.userRef.toString()) {
     return next(errorHandler(401, "You can only update your own listings!"));
   }
 

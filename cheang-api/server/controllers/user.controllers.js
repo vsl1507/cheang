@@ -2,8 +2,57 @@ import bcryptjs from "bcryptjs";
 import User from "../models/user.model.js";
 import Serivce from "../models/service.model.js";
 import SupportMessage from "../models/supportMessage.model.js";
+import Review from "../models/review.model.js";
+import Save from "../models/save.model.js";
 import { errorHandler } from "../utils/error.js";
 import { ObjectId } from "mongoose";
+
+export const populateUserCommentsAndSaves = async (userDoc) => {
+  if (!userDoc) return null;
+  const userObj = userDoc.toObject ? userDoc.toObject() : userDoc;
+  const userId = userObj._id;
+
+  const reviews = await Review.find({ handyman: userId })
+    .populate("client", "nameuser avatar")
+    .sort({ createdAt: -1 });
+
+  const formattedRatings = reviews.map(r => ({
+    _id: r._id,
+    userRate: r.client ? r.client._id.toString() : "",
+    rating: r.rating
+  }));
+
+  const formattedComments = reviews
+    .filter(r => r.comment && r.comment.trim() !== "")
+    .map(r => ({
+      _id: r._id,
+      userComment: r.client ? r.client._id.toString() : "",
+      userName: r.client ? r.client.nameuser : "",
+      userAvatar: r.client ? r.client.avatar : "",
+      comment: r.comment,
+      createdAt: r.createdAt,
+      updatedAt: r.updatedAt
+    }));
+
+  const saves = await Save.find({ userSaver: userId })
+    .populate("userSaved", "nameuser avatar");
+
+  const formattedSaves = saves.map(s => ({
+    _id: s._id,
+    userId: s.userSaved ? s.userSaved._id.toString() : "",
+    userName: s.userSaved ? s.userSaved.nameuser : "",
+    userAvatar: s.userSaved ? s.userSaved.avatar : "",
+    saveSign: s.saveSign,
+    createdAt: s.createdAt,
+    updatedAt: s.updatedAt
+  }));
+
+  userObj.ratings = formattedRatings;
+  userObj.comments = formattedComments;
+  userObj.saves = formattedSaves;
+
+  return userObj;
+};
 
 export const test = async (req, res) => {
   res.status(201).json("User created successfully");
@@ -53,7 +102,8 @@ export const updateUser = async (req, res, next) => {
       { new: true }
     );
 
-    const { password, ...rest } = updatedUser._doc;
+    const populatedUser = await populateUserCommentsAndSaves(updatedUser);
+    const { password, ...rest } = populatedUser;
 
     res.status(200).json(rest);
   } catch (error) {
@@ -76,28 +126,19 @@ export const deleteUser = async (req, res, next) => {
 
 export const ratingUser = async (req, res, next) => {
   const { rating } = req.body;
-  const userRate = req.user.id;
-  const userResive = req.params.id;
+  const client = req.user.id;
+  const handyman = req.params.id;
 
   try {
-    const userBeingRated = await User.findById(userResive);
-    const existingRating = userBeingRated.ratings.find(
-      (r) => r.userRate === userRate
+    await Review.findOneAndUpdate(
+      { client, handyman },
+      { $set: { rating } },
+      { upsert: true, new: true }
     );
 
-    if (existingRating) {
-      // Update the existing rating
-      existingRating.rating = rating;
-    } else {
-      // Add a new rating
-      userBeingRated.ratings.push({ userRate, rating });
-    }
-
-    // Save the updated user document
-    const updatedUser = await userBeingRated.save();
-
-    // Exclude password from the response
-    const { password, ...rest } = updatedUser._doc;
+    const userBeingRated = await User.findById(handyman);
+    const populatedUser = await populateUserCommentsAndSaves(userBeingRated);
+    const { password, ...rest } = populatedUser;
 
     res.status(200).json(rest);
   } catch (error) {
@@ -106,22 +147,19 @@ export const ratingUser = async (req, res, next) => {
 };
 
 export const commentUser = async (req, res, next) => {
-  const { comment, avatar, nameuser } = req.body;
-  const userComment = req.user.id;
-  const userResive = req.params.id;
+  const { comment } = req.body;
+  const client = req.user.id;
+  const handyman = req.params.id;
   try {
-    const userBeingCommented = await User.findById(userResive);
-    userBeingCommented.comments.push({
-      userComment: userComment,
-      userAvatar: avatar,
-      userName: nameuser,
-      comment: comment,
-    });
+    await Review.findOneAndUpdate(
+      { client, handyman },
+      { $set: { comment } },
+      { upsert: true, new: true }
+    );
 
-    // Save the updated user document
-    const updatedUser = await userBeingCommented.save();
-
-    const { password, ...rest } = updatedUser._doc;
+    const userBeingCommented = await User.findById(handyman);
+    const populatedUser = await populateUserCommentsAndSaves(userBeingCommented);
+    const { password, ...rest } = populatedUser;
 
     res.status(200).json(rest);
   } catch (error) {
@@ -134,18 +172,11 @@ export const deleteCommentUser = async (req, res, next) => {
   const userId = req.body.user;
 
   try {
+    await Review.findByIdAndDelete(commentId);
+
     const user = await User.findById(userId);
-    console.log(commentId);
-
-    const updatedComments = user.comments.filter(
-      (comment) => comment._id.toString() !== commentId
-    );
-
-    user.comments = updatedComments;
-    const updatedUser = await user.save();
-    console.log(updatedUser);
-    // Exclude password from the response
-    const { password, ...rest } = updatedUser._doc;
+    const populatedUser = await populateUserCommentsAndSaves(user);
+    const { password, ...rest } = populatedUser;
 
     res.status(200).json(rest);
   } catch (error) {
@@ -155,33 +186,23 @@ export const deleteCommentUser = async (req, res, next) => {
 
 export const saveUser = async (req, res, next) => {
   const { userId } = req.params;
-  const userSave = req.user.id;
+  const userSaver = req.user.id;
   try {
-    const userToSave = await User.findById(userSave);
-    const userSaved = await User.findById(userId);
-    console.log(userSaved.avatar);
-    console.log(userSaved.nameuser);
-
-    const isAlreadySaved = userToSave.saves.some(
-      (save) => save.userId === userId
-    );
-    if (isAlreadySaved) {
-      // If already saved, "unsave" the user
-      userToSave.saves = userToSave.saves.filter(
-        (save) => save.userId !== userId
-      );
+    const existingSave = await Save.findOne({ userSaver, userSaved: userId });
+    
+    if (existingSave) {
+      await Save.deleteOne({ _id: existingSave._id });
     } else {
-      // Save the user
-      userToSave.saves.push({
-        userId,
-        userAvatar: userSaved.avatar,
-        userName: userSaved.nameuser,
-        saveSign: true,
+      await Save.create({
+        userSaver,
+        userSaved: userId,
+        saveSign: true
       });
     }
-    console.log(userToSave);
-    await userToSave.save();
-    const { password, ...rest } = userToSave._doc;
+
+    const userToSave = await User.findById(userSaver);
+    const populatedUser = await populateUserCommentsAndSaves(userToSave);
+    const { password, ...rest } = populatedUser;
 
     res.status(200).json(rest);
   } catch (error) {
@@ -279,8 +300,10 @@ export const updateUserPro = async (req, res, next) => {
 export const countUsers = async (req, res, next) => {
   try {
     const users = await User.find({});
-    // console.log(users);
-    return res.status(200).json(users);
+    const populatedUsers = await Promise.all(
+      users.map(u => populateUserCommentsAndSaves(u))
+    );
+    return res.status(200).json(populatedUsers);
   } catch (error) {
     next(error);
   }
@@ -311,7 +334,8 @@ export const getUser = async (req, res, next) => {
     if (!user) {
       return next(errorHandler(404, "Listing not found!"));
     }
-    res.status(200).json(user);
+    const populatedUser = await populateUserCommentsAndSaves(user);
+    res.status(200).json(populatedUser);
   } catch (error) {
     next(error);
   }
@@ -338,7 +362,8 @@ export const getUserno = async (req, res, next) => {
     if (!user) {
       return next(errorHandler(404, "Listing not found!"));
     }
-    res.status(200).json(user);
+    const populatedUser = await populateUserCommentsAndSaves(user);
+    res.status(200).json(populatedUser);
   } catch (error) {
     next(error);
   }
