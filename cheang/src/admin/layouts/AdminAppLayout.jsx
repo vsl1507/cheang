@@ -17,7 +17,12 @@ import {
   FaBell,
   FaCog,
   FaSearch,
-  FaChevronDown
+  FaChevronDown,
+  FaUsers,
+  FaClipboardList,
+  FaComments,
+  FaHistory,
+  FaHeadset
 } from "react-icons/fa";
 import {
   signOutUserStart,
@@ -68,6 +73,31 @@ const AdminAppLayout = ({ children }) => {
       label: { en: "Confirm Requests", kh: "អនុម័តគណនីជាង", zh: "确认申请" },
       icon: <FaClipboardCheck />,
     },
+    {
+      href: "/admin/dashboard/users",
+      label: { en: "Manage Users", kh: "គ្រប់គ្រងអ្នកប្រើប្រាស់", zh: "管理用户" },
+      icon: <FaUsers />,
+    },
+    {
+      href: "/admin/dashboard/bookings",
+      label: { en: "Booking Logs", kh: "កំណត់ត្រាកក់សេវាកម្ម", zh: "预约记录" },
+      icon: <FaClipboardList />,
+    },
+    {
+      href: "/admin/dashboard/moderation",
+      label: { en: "Review Moderation", kh: "គ្រប់គ្រងការមតិយោបល់", zh: "评论审核" },
+      icon: <FaComments />,
+    },
+    {
+      href: "/admin/dashboard/logs",
+      label: { en: "Audit Trails", kh: "សកម្មភាពប្រព័ន្ធ", zh: "系统审计" },
+      icon: <FaHistory />,
+    },
+    {
+      href: "/admin/dashboard/support",
+      label: { en: "Support Tickets", kh: "ប្រអប់សំបុត្រជំនួយ", zh: "客服工单" },
+      icon: <FaHeadset />,
+    },
   ];
 
   const getSystemLabel = (key) => {
@@ -84,16 +114,70 @@ const AdminAppLayout = ({ children }) => {
   const getBreadcrumbs = () => {
     const path = window.location.pathname;
     const isConfirm = path.includes("/confirm");
+    const isUsers = path.includes("/users");
+    const isSettings = path.includes("/settings");
+    const isBookings = path.includes("/bookings");
+    const isModeration = path.includes("/moderation");
+    const isLogs = path.includes("/logs");
+    const isSupport = path.includes("/support");
+    
+    let pageLabel = "Dashboard";
+    if (language === "kh") {
+      pageLabel = isConfirm 
+        ? "អនុម័តគណនីជាង" 
+        : isUsers 
+          ? "គ្រប់គ្រងអ្នកប្រើប្រាស់" 
+          : isSettings 
+            ? "ការកំណត់" 
+            : isBookings 
+              ? "កំណត់ត្រាកក់សេវាកម្ម" 
+              : isModeration 
+                ? "គ្រប់គ្រងការមតិយោបល់" 
+                : isLogs 
+                  ? "សកម្មភាពប្រព័ន្ធ" 
+                  : isSupport
+                    ? "ប្រអប់សំបុត្រជំនួយ"
+                    : "ផ្ទាំងគ្រប់គ្រង";
+    } else if (language === "zh") {
+      pageLabel = isConfirm 
+        ? "确认申请" 
+        : isUsers 
+          ? "管理用户" 
+          : isSettings 
+            ? "系统设置" 
+            : isBookings 
+              ? "预约记录" 
+              : isModeration 
+                ? "评论审核" 
+                : isLogs 
+                  ? "系统审计" 
+                  : isSupport
+                    ? "客服工单"
+                    : "仪表板";
+    } else {
+      pageLabel = isConfirm 
+        ? "Confirm Requests" 
+        : isUsers 
+          ? "Manage Users" 
+          : isSettings 
+            ? "Settings" 
+            : isBookings 
+              ? "Booking Logs" 
+              : isModeration 
+                ? "Review Moderation" 
+                : isLogs 
+                  ? "Audit Trails" 
+                  : isSupport
+                    ? "Support Tickets"
+                    : "Dashboard";
+    }
+
     return (
       <div className="navbar-breadcrumbs">
         <FaHome className="breadcrumb-home-icon" />
         <span className="breadcrumb-parent">Admin</span>
         <span className="breadcrumb-separator">/</span>
-        <span className="breadcrumb-active">
-          {isConfirm 
-            ? (language === "kh" ? "អនុម័តគណនីជាង" : "Confirm Requests")
-            : (language === "kh" ? "ផ្ទាំងគ្រប់គ្រង" : "Dashboard")}
-        </span>
+        <span className="breadcrumb-active">{pageLabel}</span>
       </div>
     );
   };
@@ -201,9 +285,9 @@ const AdminAppLayout = ({ children }) => {
               <span className="notification-badge">3</span>
             </div>
 
-            <div className="navbar-action-btn">
+            <Link to="/admin/dashboard/settings" className="navbar-action-btn">
               <FaCog />
-            </div>
+            </Link>
 
             <div className="lang-selector-group">
               <LanguageSelector

@@ -565,7 +565,7 @@ export const getProvincesAndCities = (language) => {
       Provinces: [
         "班迭充伊省",
         "马德望省",
-        "磅士卑省",
+        "磅湛省",
         "磅清潤省",
         "磅士卑省",
         "磅吕士省",
@@ -628,7 +628,7 @@ export const getProvincesAndCities = (language) => {
           "Koas Kralor",
           "Rukkiri",
         ],
-        磅士卑省: [
+        磅湛省: [
           "Batheay",
           "Chamkar Leu",
           "Cheung Prey",
@@ -765,7 +765,7 @@ export const getProvincesAndCities = (language) => {
           "Kampong Seila",
           "Koh Rong",
         ],
-        斯德栋省: [
+        筹瑞恩省: [
           "Sesan",
           "Siem Bok",
           "Siem Pang",
@@ -773,7 +773,7 @@ export const getProvincesAndCities = (language) => {
           "Thala Parivat or Theara Parivat",
           "Borey O Svay Sen Chey",
         ],
-        斯雷恩省: [
+        斯德栋省: [
           "Chantrea",
           "Kampong Ror",
           "Romduol",
@@ -783,7 +783,7 @@ export const getProvincesAndCities = (language) => {
           "Svay Teap",
           "Bavet",
         ],
-        暹粒省: [
+        斯雷恩省: [
           "金边市",
           "Bati",
           "Borey Chulsar",
@@ -795,7 +795,7 @@ export const getProvincesAndCities = (language) => {
           "Tram Kak",
           "Traing",
         ],
-        班迭充伊省: [
+        临夏省: [
           "Anlong Veng",
           "Banteay Ampil",
           "Chong Kal",

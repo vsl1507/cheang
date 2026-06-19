@@ -13,6 +13,12 @@ import AdminSignInPage from "./admin/page/SignInPage";
 import DashboardPage from "./admin/page/DashboardPage";
 import ShowPieChart from "./admin/components/pieChart/ShowPieChart";
 import ConfirmPage from "./admin/page/ConfirmPage";
+import UserManagementPage from "./admin/page/UserManagementPage";
+import SettingsPage from "./admin/page/SettingsPage";
+import BookingLogsPage from "./admin/page/BookingLogsPage";
+import CommentModerationPage from "./admin/page/CommentModerationPage";
+import AuditLogsPage from "./admin/page/AuditLogsPage";
+import SupportInboxPage from "./admin/page/SupportInboxPage";
 import AboutPage from "./page/AboutPage";
 import GuidelinesPage from "./page/GuidelinesPage";
 import FAQPage from "./page/FAQPage";
@@ -75,6 +81,12 @@ const App = () => {
             <Route element={<PrivateRouteAdmin />}>
               <Route path="/admin/dashboard" Component={DashboardPage} />
               <Route path="/admin/dashboard/confirm" Component={ConfirmPage} />
+              <Route path="/admin/dashboard/users" Component={UserManagementPage} />
+              <Route path="/admin/dashboard/settings" Component={SettingsPage} />
+              <Route path="/admin/dashboard/bookings" Component={BookingLogsPage} />
+              <Route path="/admin/dashboard/moderation" Component={CommentModerationPage} />
+              <Route path="/admin/dashboard/logs" Component={AuditLogsPage} />
+              <Route path="/admin/dashboard/support" Component={SupportInboxPage} />
             </Route>
             <Route path="/admin/signin" Component={AdminSignInPage} />
 

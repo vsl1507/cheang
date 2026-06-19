@@ -1,6 +1,7 @@
 import bcryptjs from "bcryptjs";
 import User from "../models/user.model.js";
 import Serivce from "../models/service.model.js";
+import SupportMessage from "../models/supportMessage.model.js";
 import { errorHandler } from "../utils/error.js";
 import { ObjectId } from "mongoose";
 
@@ -338,6 +339,29 @@ export const getUserno = async (req, res, next) => {
       return next(errorHandler(404, "Listing not found!"));
     }
     res.status(200).json(user);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Create a support ticket
+export const createSupportMessage = async (req, res, next) => {
+  const { name, email, topic, message } = req.body;
+  if (!name || !email || !topic || !message) {
+    return next(errorHandler(400, "All fields are required."));
+  }
+  try {
+    const newMessage = await SupportMessage.create({
+      name,
+      email,
+      topic,
+      message,
+    });
+    return res.status(201).json({
+      success: true,
+      message: "Support ticket created successfully",
+      data: newMessage,
+    });
   } catch (error) {
     next(error);
   }

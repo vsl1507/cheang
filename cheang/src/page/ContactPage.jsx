@@ -169,6 +169,7 @@ const ContactPage = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [apiError, setApiError] = useState("");
 
   const getTranslation = (key) => {
     return contactTranslations[key]?.[language] || contactTranslations[key]?.en || "";
@@ -213,14 +214,40 @@ const ContactPage = () => {
     return Object.keys(tempErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
 
     setLoading(true);
-    // Simulate network delay
-    setTimeout(() => {
-      setLoading(false);
+    setApiError("");
+    try {
+      const topicLabels = {
+        general: "General Inquiry",
+        account: "Account & Login Issues",
+        payment: "Payments & Invoicing",
+        provider: "Service Provider Support",
+        bug: "Report Technical Bug"
+      };
+      const topicToSend = topicLabels[formData.topic] || formData.topic;
+
+      const response = await fetch("/api/user/support-message", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          topic: topicToSend,
+          message: formData.message
+        })
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to submit message.");
+      }
+
       setSuccess(true);
       setFormData({
         name: "",
@@ -228,7 +255,12 @@ const ContactPage = () => {
         topic: "",
         message: ""
       });
-    }, 1500);
+    } catch (err) {
+      console.error("Support submission error:", err);
+      setApiError(err.message || "Something went wrong. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -262,6 +294,22 @@ const ContactPage = () => {
                   </div>
                 ) : (
                   <>
+                    {apiError && (
+                      <div className="api-error-alert" style={{
+                        color: "#ef4444",
+                        background: "rgba(239, 68, 68, 0.1)",
+                        padding: "12px",
+                        borderRadius: "8px",
+                        marginBottom: "20px",
+                        fontSize: "14px",
+                        border: "1px solid rgba(239, 68, 68, 0.2)",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px"
+                      }}>
+                        <span>{apiError}</span>
+                      </div>
+                    )}
                     <div className="input-group">
                       <input
                         type="text"

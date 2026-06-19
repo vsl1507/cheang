@@ -6,6 +6,8 @@ import User from "./models/user.model.js";
 import Serivce from "./models/service.model.js";
 import Permission from "./models/v1/auth/permission.model.js";
 import Role from "./models/v1/auth/role.model.js";
+import Booking from "./models/booking.model.js";
+import SupportMessage from "./models/supportMessage.model.js";
 
 // Use Google Public DNS to resolve MongoDB Atlas SRV records reliably
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
@@ -35,6 +37,8 @@ async function seed() {
   });
   await Permission.deleteMany({});
   await Role.deleteMany({});
+  await Booking.deleteMany({});
+  await SupportMessage.deleteMany({});
   console.log("Existing seed data cleared.");
 
   // Seeding Permissions
@@ -283,6 +287,79 @@ async function seed() {
     await newService.save();
   }
   console.log("Service listings seeded successfully!");
+
+  // Seeding Platform Bookings
+  console.log("Seeding platform bookings...");
+  const bookings = [
+    {
+      client: savedClient1._id,
+      handyman: savedPro1._id,
+      serviceName: "Residential Wiring & Socket Replacement",
+      price: 45,
+      status: "Completed",
+      bookingDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+      address: "No. 12, Street 302, Chamkar Mon, Phnom Penh",
+    },
+    {
+      client: savedClient2._id,
+      handyman: savedPro2._id,
+      serviceName: "Emergency Leak Detection & Repair",
+      price: 35,
+      status: "Accepted",
+      bookingDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // tomorrow
+      address: "Wat Bo Road, Siem Reap",
+    },
+    {
+      client: savedClient1._id,
+      handyman: savedPro3._id,
+      serviceName: "Drywall Crack Patching & Painting",
+      price: 25,
+      status: "Pending",
+      bookingDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // in 3 days
+      address: "Street 271, Toul Kork, Phnom Penh",
+    },
+  ];
+
+  for (const b of bookings) {
+    const newBooking = new Booking(b);
+    await newBooking.save();
+  }
+  console.log("Bookings seeded successfully!");
+
+  // Seeding Support Messages
+  console.log("Seeding platform support messages...");
+  const supportMessages = [
+    {
+      name: "Davith Nguon",
+      email: "davith@gmail.com",
+      topic: "Account Access",
+      message: "Hello Cheang Support team, I tried to register my profile as a professional handyman but didn't receive the verification email. Could you please double check my status or guide me on what to do next? Thank you!",
+      status: "New",
+      createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000), // 3 hours ago
+    },
+    {
+      name: "Sophia Martinez",
+      email: "sophia.m@outlook.com",
+      topic: "Billing & Invoices",
+      message: "I was charged twice for booking Sophana Plumber on Tuesday. The first transaction showed an error, but both went through on my banking app. Please refund the duplicate charge of $35.",
+      status: "Pending",
+      createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+    },
+    {
+      name: "Chan Kiri",
+      email: "kiri.chan@yahoo.com",
+      topic: "General Inquiry",
+      message: "Is this platform available for services in Sihanoukville? I see mostly Phnom Penh and Siem Reap listed. Do you have plans to expand to other provinces soon?",
+      status: "Resolved",
+      createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
+    },
+  ];
+
+  for (const msg of supportMessages) {
+    const newMsg = new SupportMessage(msg);
+    await newMsg.save();
+  }
+  console.log("Support messages seeded successfully!");
 
   console.log("Seed operation finished successfully!");
   mongoose.connection.close();

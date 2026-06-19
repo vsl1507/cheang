@@ -97,6 +97,7 @@ $admin-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0
           letter-spacing: -0.5px;
           background: linear-gradient(90deg, #ff7f00 0%, #ffaa33 100%);
           -webkit-background-clip: text;
+          background-clip: text;
           -webkit-text-fill-color: transparent;
         }
 

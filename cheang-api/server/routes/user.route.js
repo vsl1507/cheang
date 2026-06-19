@@ -17,10 +17,12 @@ import {
   saveUser,
   searchUsers,
   liveSearch,
+  createSupportMessage,
 } from "../controllers/user.controllers.js";
 import { verifyToken } from "../utils/verifyUser.js";
 
 const userRouter = express.Router();
+userRouter.post("/support-message", createSupportMessage);
 userRouter.get("/test", test);
 userRouter.delete("/delete/:id", verifyToken, deleteUser);
 userRouter.get("/services/:id", verifyToken, getUserService);

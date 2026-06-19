@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import { errorHandler } from "./error.js";
+import User from "../models/user.model.js";
 
 export const verifyToken = (req, res, next) => {
   const token = req.cookies.access_token;
@@ -13,3 +14,19 @@ export const verifyToken = (req, res, next) => {
     next();
   });
 };
+
+export const verifyAdmin = async (req, res, next) => {
+  try {
+    if (!req.user || !req.user.id) {
+      return next(errorHandler(401, "Unauthorized"));
+    }
+    const user = await User.findById(req.user.id);
+    if (!user || !user.admin) {
+      return next(errorHandler(403, "Access denied. Admin role required."));
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
