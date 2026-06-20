@@ -102,12 +102,13 @@ const SearchFilter = () => {
     setSelectedMainService(event.target.value);
     const index = servicesLanguage.MainService.indexOf(event.target.value);
     setSelectedSubService(""); // Reset city when province changes
+    const mainServiceVal = servicesEnglsih.MainService[index] || "";
     setFormData({
       ...formData,
-      mainService: servicesEnglsih.MainService[index], // Set the province in formData
+      mainService: mainServiceVal, // Set the province in formData
       subService: "", // Reset city in formData
     });
-    updateAndFetch("mainService", mainService);
+    updateAndFetch("mainService", mainServiceVal);
   };
 
   const handleSubServiceChange = (event) => {
@@ -149,7 +150,7 @@ const SearchFilter = () => {
       });
 
       const data = await res.json();
-      setLiveSearchResults(data);
+      setLiveSearchResults(data.data || data);
       setLoading(false);
     } catch (error) {
       setError(error.message);

@@ -109,7 +109,7 @@ const UsersList = () => {
         if (data.success === false) {
           setError(data.message);
         } else {
-          setUsers(data);
+          setUsers(data.data || data);
         }
         setLoading(false);
       } catch (err) {

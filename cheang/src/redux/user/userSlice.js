@@ -14,7 +14,7 @@ const userSlice = createSlice({
       state.loading = true;
     },
     signInSuccess: (state, action) => {
-      state.currentUser = action.payload;
+      state.currentUser = action.payload && action.payload.success && action.payload.data !== undefined ? action.payload.data : action.payload;
       state.loading = false;
       state.error = null;
     },
@@ -26,7 +26,7 @@ const userSlice = createSlice({
       state.loading = true;
     },
     updateUserSuccess: (state, action) => {
-      state.currentUser = action.payload;
+      state.currentUser = action.payload && action.payload.success && action.payload.data !== undefined ? action.payload.data : action.payload;
       state.loading = false;
       state.error = null;
     },

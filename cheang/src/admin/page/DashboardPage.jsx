@@ -24,7 +24,7 @@ const DashboardPage = () => {
         if (data.success === false) {
           setError(data.message);
         } else {
-          setUsers(data);
+          setUsers(data.data || data);
         }
       } catch (err) {
         setError(err.message);

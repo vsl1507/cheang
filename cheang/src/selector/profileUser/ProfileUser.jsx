@@ -39,13 +39,18 @@ const ProfileUser = () => {
   const { currentUser } = useSelector((state) => state.user);
   const [formData, setFormData] = useState({});
 
+  useEffect(() => {
+    if (user) {
+      setNormal(user.userPro ? "service" : "about");
+    }
+  }, [user]);
+
   ////////////////Rating////////////////////////////
   const [userRating, setUserRating] = useState(0);
 
   const handleRatingChange = (newRating) => {
     setFormData({
       ...formData,
-      // Assuming you want to set the userRating in formData
       userRating: newRating,
     });
   };
@@ -70,25 +75,20 @@ const ProfileUser = () => {
         return;
       }
 
-      // Assuming the server responds with the updated user data
-      setUser(data.updatedUser); // Update the state with the new data
-      // dispatch(updateUserSuccess(data)); // Assuming you have a success action
+      setUser(data.data || data);
 
-      // Fetch the updated user data after rating
       const updatedUserResponse = await fetch(
         `/api/user/getUser/${params.userId}`
       );
       const updatedUserData = await updatedUserResponse.json();
-      setUser(updatedUserData);
-
-      // dispatch(updateUserSuccess(data));
+      setUser(updatedUserData.data || updatedUserData);
     } catch (error) {
       dispatch(updateUserFailure(error.message));
     }
   };
 
   const averageRating =
-    user && user.ratings.length > 0
+    user && user.ratings && user.ratings.length > 0
       ? user.ratings.reduce((sum, rating) => sum + rating.rating, 0) /
         user.ratings.length
       : 0;
@@ -103,7 +103,7 @@ const ProfileUser = () => {
 
   const handleCommentSubmit = async (e) => {
     try {
-      e.preventDefault(); // Prevent the default form submission
+      e.preventDefault();
 
       dispatch(updateUserStart());
 
@@ -124,17 +124,14 @@ const ProfileUser = () => {
         dispatch(updateUserFailure(data.message));
         return;
       }
-      // Assuming the server responds with the updated user data
-      setUser(data.updatedUser); // Update the state with the new data
+      setUser(data.data || data);
 
-      // Fetch the updated user data after posting a comment
       const updatedUserResponse = await fetch(
         `/api/user/getUser/${params.userId}`
       );
       const updatedUserData = await updatedUserResponse.json();
-      setUser(updatedUserData);
+      setUser(updatedUserData.data || updatedUserData);
 
-      // // Clear the newComment state after successful comment submission
       setNewComment("");
     } catch (error) {
       dispatch(updateUserFailure(error.message));
@@ -149,7 +146,6 @@ const ProfileUser = () => {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          // Include any authentication headers if required
         },
         body: JSON.stringify({
           user: user._id,
@@ -157,12 +153,11 @@ const ProfileUser = () => {
       });
 
       const data = await res.json();
-      // console.log(data);
       if (data.success === false) {
         dispatch(updateUserFailure(data.message));
         return;
       }
-      setUser(data);
+      setUser(data.data || data);
     } catch (error) {
       dispatch(updateUserFailure(error.message));
     }
@@ -184,8 +179,7 @@ const ProfileUser = () => {
       if (data.success === false) {
         dispatch(updateUserFailure(data.message));
       } else {
-        // Dispatch a success action if the save operation is successful
-        dispatch(updateUserSuccess(data));
+        dispatch(updateUserSuccess(data.data || data));
       }
     } catch (error) {
       dispatch(updateUserFailure(error.message));
@@ -195,7 +189,6 @@ const ProfileUser = () => {
   const isAlreadySaved = currentUser?.saves.some(
     (save) => save.userId === params.userId
   );
-  //////////////////////////////
 
   useEffect(() => {
     const fetchService = async () => {
@@ -208,7 +201,7 @@ const ProfileUser = () => {
           setLoading(false);
           return;
         }
-        setUser(data);
+        setUser(data.data || data);
         setLoading(false);
         setError(false);
       } catch (error) {
@@ -217,168 +210,224 @@ const ProfileUser = () => {
       }
     };
     fetchService();
-    // const fetchUser = async () => {
-    //   try {
-    //     setLoading(true);
-    //     const res = await fetch(`/api/user/getUserno/${params.userId}`);
-    //     const data = await res.json();
-    //     if (data.success === false) {
-    //       setError(true);
-    //       setLoading(false);
-    //       return;
-    //     }
-    //     setUser(data);
-    //     setLoading(false);
-    //     setError(false);
-    //   } catch (error) {
-    //     setError(true);
-    //     setLoading(false);
-    //   }
-    // };
-    // fetchUser();
-  }, []);
+  }, [params.userId]);
+
   return (
     <div className={`ProfileContainer ${theme}`}>
       <div className="ProfileContainer-container">
         <div className="ProfileContainer-container-left">
-          {loading && <p className="">Loading...</p>}
-          {error && <p className="">Something went wrong!</p>}
+          {loading && <p className="loading-text">Loading...</p>}
+          {error && <p className="error-text">Something went wrong!</p>}
           {user && !loading && !error && (
-            <div className={`userprofileDetail ${theme}`}>
-              <div className="userserviceDetail-container" key={user.id}>
-                <Profile src={user.avatar} />
-                <Label label={user.brandName} />
-                <div className="userserviceDetail-container-tag">
-                  <Tag label={user.mainService} />
-                  <Tag label={user.subService} />
-                </div>
-                <div className="userserviceDetail-container-rate">
-                  <ShowStar rating={averageRating.toFixed(2)} />
-                  <p>{averageRating.toFixed(2)}</p>
-                </div>
-                <div className="userserviceDetail-container-detail">
-                  <div className="TextBorder-container">
-                    <TextBorder
-                      label={<FaMapMarkerAlt />}
-                      text={user.city + " , " + user.province}
+            user.userPro ? (
+              <div className={`userprofileDetail ${theme} pro-card`}>
+                <div className="profile-banner pro-banner"></div>
+                <div className="userserviceDetail-container" key={user.id}>
+                  <div className="profile-avatar-wrapper">
+                    <Profile src={user.avatar} />
+                    <span className="account-badge pro-badge">Pro</span>
+                  </div>
+                  <Label label={user.brandName || "Repair Provider"} />
+                  <h3 className="profile-owner-name">Owner: {user.nameuser}</h3>
+                  <div className="userserviceDetail-container-tag">
+                    {user.mainService && user.mainService !== "None" && user.mainService !== "NONE" && <Tag label={user.mainService} />}
+                    {user.subService && user.subService !== "None" && user.subService !== "NONE" && <Tag label={user.subService} />}
+                    {(!user.mainService || user.mainService === "None" || user.mainService === "NONE") && <Tag label="Handyman Account" />}
+                  </div>
+                  <div className="userserviceDetail-container-rate">
+                    <ShowStar rating={averageRating.toFixed(2)} />
+                    <p>{averageRating.toFixed(2)}</p>
+                  </div>
+                  <div className="userserviceDetail-container-detail">
+                    <div className="TextBorder-container">
+                      <TextBorder
+                        label={<FaMapMarkerAlt />}
+                        text={
+                          (user.city && user.city !== "None" && user.city !== "NONE") || 
+                          (user.province && user.province !== "None" && user.province !== "NONE") ?
+                          (user.city + " , " + user.province) :
+                          "Location not set"
+                        }
+                      />
+                      <TextBorder
+                        label={<FaPhoneAlt />}
+                        text={user.phone && user.phone !== "None" && user.phone !== "NONE" ? user.phone : "No phone added"}
+                      />
+                    </div>
+                  </div>
+                  <div className="userserviceDetail-container-rating">
+                    <StarRating
+                      userId={params.userId}
+                      onChange={handleRatingChange}
                     />
-                    <TextBorder label={<FaPhoneAlt />} text={user.phone} />
+                    <button onClick={handleSubmit}>Submit Rating</button>
                   </div>
                 </div>
-                <div className="userserviceDetail-container-rating">
-                  {/* <Label label="Rate this service" /> */}
-                  <StarRating
-                    userId={params.userId}
-                    onChange={handleRatingChange}
-                  />
-                  <button onClick={handleSubmit}>Submit Rating</button>
+              </div>
+            ) : (
+              <div className={`userprofileDetail ${theme} client-card`}>
+                <div className="profile-banner client-banner"></div>
+                <div className="userserviceDetail-container" key={user.id}>
+                  <div className="profile-avatar-wrapper">
+                    <Profile src={user.avatar} />
+                    <span className="account-badge client-badge">Client</span>
+                  </div>
+                  <Label label={user.nameuser} />
+                  <div className="userserviceDetail-container-detail">
+                    <div className="TextBorder-container">
+                      <TextBorder
+                        label={<FaMapMarkerAlt />}
+                        text={
+                          (user.city && user.city !== "None" && user.city !== "NONE") || 
+                          (user.province && user.province !== "None" && user.province !== "NONE") ?
+                          (user.city + " , " + user.province) :
+                          "Location not set"
+                        }
+                      />
+                      <TextBorder
+                        label={<FaPhoneAlt />}
+                        text={user.phone && user.phone !== "None" && user.phone !== "NONE" ? user.phone : "No phone added"}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            )
           )}
         </div>
         <div className="ProfileContainer-container-right">
           <div className="profileTodo">
-            <>
-              {normal === "service" ? (
+            {user && !loading && !error && (
+              user.userPro ? (
                 <>
-                  <div className="serviceDetail-container">
-                    <button className="disabled" disabled>
-                      {<FaWrench style={{ marginRight: "8px" }} />}
-                      Service
-                    </button>
-                    <button onClick={() => setNormal("about")}>
-                      {<FaInfoCircle style={{ marginRight: "8px" }} />}
-                      About
-                    </button>
-                    <button onClick={handleSave}>
-                      {isAlreadySaved ? (
-                        <>
-                          <FaRegSave style={{ marginRight: "8px" }} />
-                          Unsave
-                        </>
-                      ) : (
-                        <>
-                          <FaSave style={{ marginRight: "8px" }} />
-                          Save
-                        </>
-                      )}
-                    </button>
-                  </div>
-                  <ServiceSelectorUser />
-                </>
-              ) : normal === "about" ? (
-                <>
-                  <div className="serviceDetail-container">
-                    <button onClick={() => setNormal("service")}>
-                      {<FaWrench style={{ marginRight: "8px" }} />}
-                      Service
-                    </button>
-                    <button className="disabled" disabled>
-                      {<FaInfoCircle style={{ marginRight: "8px" }} />}
-                      About
-                    </button>
-                    <button onClick={handleSave}>
-                      {isAlreadySaved ? (
-                        <>
-                          <FaRegSave style={{ marginRight: "8px" }} />
-                          Unsave
-                        </>
-                      ) : (
-                        <>
-                          <FaSave style={{ marginRight: "8px" }} />
-                          Save
-                        </>
-                      )}
-                    </button>
-                  </div>
-
-                  <AboutUser />
+                  {normal === "service" ? (
+                    <>
+                      <div className="serviceDetail-container">
+                        <button className="disabled" disabled>
+                          <FaWrench style={{ marginRight: "8px" }} />
+                          Service
+                        </button>
+                        <button onClick={() => setNormal("about")}>
+                          <FaInfoCircle style={{ marginRight: "8px" }} />
+                          About
+                        </button>
+                        <button onClick={handleSave}>
+                          {isAlreadySaved ? (
+                            <>
+                              <FaRegSave style={{ marginRight: "8px" }} />
+                              Unsave
+                            </>
+                          ) : (
+                            <>
+                              <FaSave style={{ marginRight: "8px" }} />
+                              Save
+                            </>
+                          )}
+                        </button>
+                      </div>
+                      <ServiceSelectorUser />
+                    </>
+                  ) : normal === "about" ? (
+                    <>
+                      <div className="serviceDetail-container">
+                        <button onClick={() => setNormal("service")}>
+                          <FaWrench style={{ marginRight: "8px" }} />
+                          Service
+                        </button>
+                        <button className="disabled" disabled>
+                          <FaInfoCircle style={{ marginRight: "8px" }} />
+                          About
+                        </button>
+                        <button onClick={handleSave}>
+                          {isAlreadySaved ? (
+                            <>
+                              <FaRegSave style={{ marginRight: "8px" }} />
+                              Unsave
+                            </>
+                          ) : (
+                            <>
+                              <FaSave style={{ marginRight: "8px" }} />
+                              Save
+                            </>
+                          )}
+                        </button>
+                      </div>
+                      <AboutUser />
+                    </>
+                  ) : null}
                 </>
               ) : (
-                ""
-              )}
-            </>
+                <>
+                  {normal === "about" ? (
+                    <>
+                      <div className="serviceDetail-container">
+                        <button className="disabled" disabled>
+                          <FaInfoCircle style={{ marginRight: "8px" }} />
+                          About
+                        </button>
+                        <button onClick={handleSave}>
+                          {isAlreadySaved ? (
+                            <>
+                              <FaRegSave style={{ marginRight: "8px" }} />
+                              Unsave
+                            </>
+                          ) : (
+                            <>
+                              <FaSave style={{ marginRight: "8px" }} />
+                              Save
+                            </>
+                          )}
+                        </button>
+                      </div>
+                      <AboutUser />
+                    </>
+                  ) : null}
+                </>
+              )
+            )}
           </div>
         </div>
       </div>
 
-      {/* //////////// */}
-      <div className="ProfileContainer-container-bottom">
-        <Label label="Comments" />
-        <div className="comment-container">
-          <Profile src={currentUser.avatar} />
-          <textarea
-            className="comment-box"
-            value={newComment}
-            onChange={handleCommentChange}
-            placeholder="Type your comment..."
-          />
-          <button onClick={handleCommentSubmit}>
-            <FaComment style={{ marginRight: "8px" }} />
-            Comments
-          </button>
+      {user && !loading && !error && user.userPro && (
+        <div className="ProfileContainer-container-bottom">
+          <Label label="Comments" />
+          <div className="comment-container">
+            <Profile src={currentUser?.avatar} />
+            <textarea
+              className="comment-box"
+              value={newComment}
+              onChange={handleCommentChange}
+              placeholder="Type your comment..."
+            />
+            <button onClick={handleCommentSubmit}>
+              <FaComment style={{ marginRight: "8px" }} />
+              Comments
+            </button>
+          </div>
+          <div className="comment-area">
+            <ul>
+              {user?.comments.map((comment, index) => (
+                <li className="comment-item" key={index}>
+                  <div className="comment-area-profile">
+                    <Profile src={comment.userAvatar} />
+                    <p>{comment.userName}</p>
+                  </div>
+                  <div className="comment-area-comments">
+                    <p>{comment.comment}</p>
+                    {currentUser && (currentUser._id === comment.userComment || currentUser.isAdmin) && (
+                      <NavigationLink
+                        onClick={() => handleCommentDelete(comment._id)}
+                        value="Delete"
+                      />
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
-        <div className="comment-area">
-          <ul>
-            {user?.comments.map((comment, index) => (
-              <div key={index}>
-                <div className="comment-area-profile">
-                  <Profile src={comment.userAvatar} />
-                  <p>{comment.userName}</p>
-                </div>
-                <div className="comment-area-comments">
-                  <p>{comment.comment}</p>
-                  <NavigationLink
-                    onClick={() => handleCommentDelete(comment._id)}
-                    value="Delete"
-                  />
-                </div>
-              </div>
-            ))}
-          </ul>
-        </div>
-      </div>
+      )}
     </div>
   );
 };

@@ -204,7 +204,7 @@ const SignUpPro = () => {
         dispatch(updateUserFailure(data.message));
         return;
       }
-      dispatch(updateUserSuccess(data));
+      dispatch(updateUserSuccess(data.data || data));
       navigate("/");
     } catch (err) {
       dispatch(updateUserFailure(err.message));

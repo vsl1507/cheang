@@ -1,259 +1,790 @@
 @import "../../variables";
-@mixin sample-profileContainer {
-  .ProfileContainer-container {
+
+// Professional Animation Frames
+$fade-in-up: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+$glow-pulse: glowPulse 2.5s infinite alternate;
+$client-glow-pulse: clientGlowPulse 2.5s infinite alternate;
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes glowPulse {
+  from {
+    box-shadow: 0 8px 20px rgba(255, 127, 0, 0.15);
+  }
+  to {
+    box-shadow: 0 12px 30px rgba(255, 127, 0, 0.35);
+  }
+}
+
+@keyframes clientGlowPulse {
+  from {
+    box-shadow: 0 8px 20px rgba(79, 70, 229, 0.15);
+  }
+  to {
+    box-shadow: 0 12px 30px rgba(79, 70, 229, 0.35);
+  }
+}
+
+// Unified Page Layout with Professional Glow Effects
+.ProfileContainer {
+  position: relative;
+  min-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  // Background glow element 1 (Top Left)
+  &::before {
+    content: "";
+    position: absolute;
+    top: -10%;
+    left: -10%;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 127, 0, 0.08) 0%, rgba(255, 127, 0, 0) 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  // Background glow element 2 (Bottom Right)
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -10%;
+    right: -10%;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 127, 0, 0.05) 0%, rgba(255, 127, 0, 0) 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .profile-dashboard-tabs-wrapper {
+    position: relative;
+    z-index: 2;
     width: 100%;
+    max-width: 1200px;
+    margin: 2.5rem auto 0 auto;
+    padding: 0 2rem;
     display: flex;
-    justify-content: space-around;
-    background-color: $secondary-color-light;
-    .ProfileContainer-container-left {
-      width: 30%;
-      margin: 1rem 0;
-      box-shadow: $box-shadow;
-      background-color: $primary-color-light;
-    }
-    .ProfileContainer-container-right {
-      width: 65%;
-      padding-bottom: 1rem;
-      margin: 1rem 0;
-      background-color: $primary-color-light;
-      box-shadow: $box-shadow;
+    justify-content: center;
+
+    .serviceDetail-container {
+      margin-bottom: 0;
     }
   }
 
-  .ProfileContainer-container-bottom {
-    margin: 1rem;
+  .ProfileContainer-container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 1200px;
+    margin: 1.5rem auto 2.5rem auto;
+    display: flex;
+    gap: 2.5rem;
+    padding: 0 2rem;
+    animation: $fade-in-up;
 
-    background-color: $primary-color-light;
+    // Profile Summary Card (Left Column)
+    .ProfileContainer-container-left {
+      width: 32%;
+      flex-shrink: 0;
+      border-radius: 20px;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      
+      &:hover {
+        transform: translateY(-6px);
+      }
+    }
+
+    // Detail/Content Tabs Card (Right Column)
+    .ProfileContainer-container-right {
+      width: 68%;
+      border-radius: 20px;
+      overflow: hidden;
+      padding: 2.5rem;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+  }
+
+  // Reviews/Comments bottom block
+  .ProfileContainer-container-bottom {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto 3rem auto;
+    padding: 2.5rem;
+    border-radius: 20px;
+    animation: $fade-in-up;
+    animation-delay: 0.15s;
+
     .comment-container {
       display: flex;
-      align-items: center;
-      justify-content: space-around;
+      align-items: flex-start;
+      gap: 1.5rem;
+      margin-top: 2rem;
+      
       img {
-        width: 3rem;
-        height: 3rem;
-        border: 1px solid $accent-color;
+        width: 3.5rem;
+        height: 3.5rem;
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
       }
-      button {
-        padding: 1rem;
-      }
+
       .comment-box {
-        padding: 0.5rem;
-        margin: 0.5rem 0rem;
-        border-radius: 0.5rem;
-        width: 80%;
+        flex-grow: 1;
+        padding: 1.2rem;
+        border-radius: 14px;
+        font-family: inherit;
+        font-size: 0.95rem;
+        resize: none;
+        height: 90px;
+        transition: all 0.3s ease;
+      }
+
+      button {
+        align-self: center;
+        padding: 0.9rem 1.6rem;
+        font-weight: 700;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+        &:hover {
+          transform: translateY(-2px);
+        }
       }
     }
 
     .comment-area {
-      padding: 0;
-      margin: 0;
-      margin-top: 1rem;
-      border-top: 2px solid $secondary-color-light;
+      margin-top: 2.5rem;
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+      padding-top: 2rem;
+
       ul {
         list-style: none;
         padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
       }
+
+      .comment-item {
+        border-radius: 14px;
+        padding: 1.5rem;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        border: 1px solid transparent;
+        
+        &:hover {
+          transform: translateX(6px);
+        }
+      }
+
       .comment-area-profile {
         display: flex;
-        flex-direction: row;
         align-items: center;
-        padding: 0;
-        margin: 0 1rem;
+        gap: 1rem;
+        margin-bottom: 1rem;
+
         img {
-          margin-right: 1rem;
-          width: 2rem;
-          height: 2rem;
-          border: 1px solid $accent-color;
+          width: 2.5rem;
+          height: 2.5rem;
+          border-radius: 50%;
+          object-fit: cover;
         }
+
         p {
+          font-weight: 700;
           font-size: 1rem;
-          padding: 0;
           margin: 0;
         }
       }
+
       .comment-area-comments {
         display: flex;
-        align-items: center;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 2rem;
+
         p {
-          padding: $spacing-unit;
-          margin: 0 4rem;
-          border: 1px solid $accent-color;
-          width: 90%;
-          border-radius: 0.5rem;
-        }
-        h2 {
-          padding: $spacing-unit;
           margin: 0;
-          font-size: 0.5rem;
+          font-size: 0.98rem;
+          line-height: 1.6;
+          flex-grow: 1;
+        }
+
+        a {
+          font-size: 0.85rem;
+          font-weight: 700;
+          text-decoration: none;
+          padding: 0.4rem 1rem;
+          border-radius: 8px;
+          transition: all 0.2s ease;
         }
       }
     }
   }
 }
 
-%profileContainer-light {
-  @include breakpoint-big($tablet-breakpoint) {
-    @include sample-profileContainer;
+// Light Theme Glassmorphism & Color Palettes
+.ProfileContainer.light {
+  background-color: #f7f9fc;
+
+  .ProfileContainer-container-left,
+  .ProfileContainer-container-right,
+  .ProfileContainer-container-bottom {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.04);
   }
-  @include breakpoint-small($tablet-breakpoint) {
+
+  .comment-container {
+    .comment-box {
+      border: 1.5px solid rgba(0, 0, 0, 0.08);
+      background-color: #ffffff;
+      color: $font-color-light;
+      
+      &:focus {
+        border-color: $accent-color;
+        box-shadow: 0 0 0 4px rgba(255, 127, 0, 0.12);
+      }
+    }
+    button {
+      background: linear-gradient(135deg, $accent-color, #ff9f43);
+      box-shadow: 0 4px 15px rgba(255, 127, 0, 0.25);
+      
+      &:hover {
+        box-shadow: 0 6px 20px rgba(255, 127, 0, 0.35);
+      }
+    }
+  }
+
+  .comment-item {
+    background-color: rgba(0, 0, 0, 0.015);
+    border-color: rgba(0, 0, 0, 0.03);
+  }
+
+  .comment-area-comments {
+    p {
+      color: lighten($font-color-light, 12%);
+    }
+    a {
+      color: $danger-color;
+      border: 1.5px solid rgba(220, 53, 69, 0.2);
+      &:hover {
+        background-color: rgba(220, 53, 69, 0.08);
+        border-color: $danger-color;
+      }
+    }
+  }
+}
+
+// Dark Theme Glassmorphism & Color Palettes
+.ProfileContainer.dark {
+  background-color: #0f0d0c;
+
+  .ProfileContainer-container-left,
+  .ProfileContainer-container-right,
+  .ProfileContainer-container-bottom {
+    background: rgba(30, 27, 25, 0.7);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  }
+
+  .comment-container {
+    .comment-box {
+      border: 1.5px solid rgba(255, 255, 255, 0.08);
+      background-color: rgba(0, 0, 0, 0.25);
+      color: $font-color-dark;
+      
+      &:focus {
+        border-color: $accent-color;
+        box-shadow: 0 0 0 4px rgba(255, 127, 0, 0.2);
+      }
+    }
+    button {
+      background: linear-gradient(135deg, $accent-color, #ff9f43);
+      box-shadow: 0 4px 15px rgba(255, 127, 0, 0.25);
+      
+      &:hover {
+        box-shadow: 0 6px 20px rgba(255, 127, 0, 0.35);
+      }
+    }
+  }
+
+  .comment-item {
+    background-color: rgba(255, 255, 255, 0.015);
+    border-color: rgba(255, 255, 255, 0.03);
+  }
+
+  .comment-area-comments {
+    p {
+      color: darken($font-color-dark, 15%);
+    }
+    a {
+      color: #ff4d4d;
+      border: 1.5px solid rgba(255, 77, 77, 0.2);
+      &:hover {
+        background-color: rgba(255, 77, 77, 0.08);
+        border-color: #ff4d4d;
+      }
+    }
+  }
+}
+
+// User Profile Details (Left Card Summary)
+@mixin sample-profileDetail {
+  position: relative;
+  overflow: hidden;
+
+  // Banner area inside card
+  .profile-banner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 110px;
+    z-index: 0;
+
+    &.pro-banner {
+      background: linear-gradient(135deg, $accent-color, #ffaa44);
+      &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
+      }
+    }
+
+    &.client-banner {
+      background: linear-gradient(135deg, #4f46e5, #06b6d4);
+      &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
+      }
+    }
+  }
+
+  .userserviceDetail-container {
+    padding: 5.5rem 1.5rem 2.5rem 1.5rem;
     display: flex;
     flex-direction: column;
-    .ProfileContainer-container-bottom {
-      background-color: $primary-color-light;
+    align-items: center;
+    position: relative;
+    z-index: 1;
 
-      .comment-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        img {
-          width: 2rem;
-          height: 2rem;
-          border: 1px solid $accent-color;
-        }
-        button {
-          padding: 0.5rem;
-        }
-        .comment-box {
-          padding: 0.5rem;
-          margin: 0.5rem 0rem;
-          border-radius: 0.5rem;
-          width: 60%;
-        }
+    // Professional status ring around Avatar
+    .profile-avatar-wrapper {
+      position: relative;
+      width: 8rem;
+      height: 8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      padding: 3px;
+      margin-bottom: 1.2rem;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+      &:hover {
+        transform: scale(1.06) rotate(3deg);
+      }
+      
+      img.profile {
+        width: 100% !important;
+        height: 100% !important;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #fff !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
       }
 
-      .comment-area {
-        padding: 0;
+      .account-badge {
+        position: absolute;
+        bottom: -2px;
+        right: -2px;
+        font-size: 0.72rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        color: #fff;
+        padding: 4px 12px;
+        border-radius: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        letter-spacing: 0.5px;
+        z-index: 2;
+        border: 2px solid #fff;
+      }
+    }
+
+    // Owner name subtext under brand
+    .profile-owner-name {
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin: 0.25rem 0 0.75rem 0;
+      opacity: 0.75;
+      letter-spacing: -0.2px;
+    }
+
+    // Modern Pill Tag overrides inside profiles
+    .label {
+      background-color: rgba(255, 127, 0, 0.09) !important;
+      color: $accent-color !important;
+      border: 1px solid rgba(255, 127, 0, 0.15) !important;
+      border-radius: 30px !important;
+      padding: 0.35rem 1rem !important;
+      font-size: 0.78rem !important;
+      font-weight: 700 !important;
+      margin: 0 !important;
+      display: inline-block !important;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    h2 {
+      font-size: 1.45rem;
+      font-weight: 850;
+      margin: 0.5rem 0;
+      letter-spacing: -0.5px;
+      text-align: center;
+    }
+
+    .userserviceDetail-container-tag {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+    }
+
+    // Modern rating badge pill
+    .userserviceDetail-container-rate {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: rgba(0, 0, 0, 0.03);
+      padding: 0.4rem 1.2rem;
+      border-radius: 30px;
+      margin-bottom: 1.5rem;
+      
+      p {
+        font-weight: 800;
+        font-size: 1.05rem;
         margin: 0;
-        margin-top: 1rem;
-        border-top: 2px solid $secondary-color-light;
-        ul {
-          list-style: none;
-          padding: 0;
+        color: $accent-color;
+      }
+
+      &.no-ratings {
+        background: rgba(0, 0, 0, 0.02);
+        .no-ratings-text {
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: lighten($font-color-light, 25%);
+          margin: 0;
         }
-        .comment-area-profile {
+      }
+    }
+
+    // Detail parameters (TextBorder component updates)
+    .userserviceDetail-container-detail {
+      width: 100%;
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+      padding-top: 1.5rem;
+      margin-top: 0.5rem;
+      
+      .TextBorder-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+      }
+
+      .TextBorder {
+        .TextBorder-container {
           display: flex;
           flex-direction: row;
           align-items: center;
-          padding: 0;
-          margin: 0 $spacing-unit;
-          img {
-            margin-right: $spacing-unit;
-            width: 2rem;
-            height: 2rem;
-            border: 1px solid $accent-color;
-          }
-          p {
-            font-size: 1rem;
+          justify-content: flex-start;
+          gap: 1rem;
+          padding: 0.7rem 1.2rem;
+          border-radius: 12px;
+          background-color: rgba(0, 0, 0, 0.02);
+          border: 1px solid rgba(0, 0, 0, 0.01);
+          color: $font-color-light;
+          
+          .TextBorder-container-label {
+            color: $accent-color;
+            font-size: 1.1rem;
             padding: 0;
             margin: 0;
+            display: flex;
+            align-items: center;
+            background: rgba(255, 127, 0, 0.1);
+            padding: 0.4rem;
+            border-radius: 50%;
           }
-        }
-        .comment-area-comments {
-          display: flex;
-          align-items: center;
-          p {
-            padding: $spacing-unit;
-            margin: 0 3rem;
-            border: 1px solid $accent-color;
-            width: 80%;
-            border-radius: 0.5rem;
-          }
-          a {
-            padding: $spacing-unit;
+
+          .TextBorder-container-text {
+            font-weight: 600;
+            font-size: 0.92rem;
             margin: 0;
-            font-size: 0.7rem;
+            color: lighten($font-color-light, 10%);
           }
         }
       }
     }
-  }
-}
 
-%profileContainer-dark {
-  @extend %profileContainer-light;
-  .ProfileContainer-container {
-    background-color: $secondary-color-dark;
-    .ProfileContainer-container-left {
-      background-color: $primary-color-dark;
-    }
-    .ProfileContainer-container-right {
-      background-color: $primary-color-dark;
-    }
-  }
-}
-.ProfileContainer.light {
-  @extend %profileContainer-light;
-}
-
-.ProfileContainer.dark {
-  @extend %profileContainer-dark;
-}
-
-@mixin sample-profileDetail {
-  .userserviceDetail-container {
-    width: auto;
-    height: auto;
-    text-align: center;
-    justify-content: center;
-    align-items: center;
-    margin: 0.5rem;
-    h2 {
-      white-space: normal;
-    }
-    .userserviceDetail-container-tag {
+    // Submit rating widget
+    .userserviceDetail-container-rating {
+      width: 100%;
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+      padding-top: 1.5rem;
+      margin-top: 1.5rem;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      margin: 0;
-      padding: 0;
-    }
-    .userserviceDetail-container-rate {
-      display: flex;
-      flex-direction: row;
       align-items: center;
-      justify-content: center;
-      p {
-        margin-left: 1rem;
+      gap: 1rem;
+
+      button {
+        width: 100%;
+        padding: 0.8rem 1.5rem;
+        font-weight: 700;
+        font-size: 0.92rem;
+        background-color: transparent;
+        border: 2px solid $accent-color;
+        color: $accent-color;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+        &:hover {
+          background-color: $accent-color;
+          color: #fff;
+          box-shadow: 0 4px 15px rgba(255, 127, 0, 0.2);
+          transform: translateY(-1px);
+        }
       }
-    }
-    .userserviceDetail-container-detail {
-      width: auto;
-      padding: 0 $spacing_unit;
-      p {
-        margin: 0.5rem 0;
-      }
-    }
-    .userserviceDetail-container-rating {
-      margin-top: 1rem;
     }
   }
-  @content;
-}
-
-%profileDetail-light {
-  @include sample-profileDetail;
-}
-%profileDetail-dark {
-  @include sample-profileDetail;
 }
 
 .userprofileDetail.light {
-  @extend %profileDetail-light;
+  @include sample-profileDetail;
+
+  &.pro-card {
+    .profile-avatar-wrapper {
+      background: linear-gradient(135deg, $accent-color, #ff9f43);
+      animation: $glow-pulse;
+      .account-badge {
+        background: linear-gradient(135deg, $accent-color, #ff9f43);
+      }
+    }
+  }
+
+  &.client-card {
+    .profile-avatar-wrapper {
+      background: linear-gradient(135deg, #4f46e5, #06b6d4);
+      animation: $client-glow-pulse;
+      .account-badge {
+        background: linear-gradient(135deg, #4f46e5, #06b6d4);
+      }
+    }
+    .userserviceDetail-container-detail {
+      border-top: none;
+      padding-top: 0.5rem;
+    }
+  }
 }
 
 .userprofileDetail.dark {
-  @extend %profileDetail-dark;
+  @include sample-profileDetail;
+
+  &.pro-card {
+    .profile-avatar-wrapper {
+      background: linear-gradient(135deg, $accent-color, #ff9f43);
+      animation: $glow-pulse;
+      img.profile {
+        border-color: #1e1b19 !important;
+      }
+      .account-badge {
+        border-color: #1e1b19 !important;
+        background: linear-gradient(135deg, $accent-color, #ff9f43);
+      }
+    }
+  }
+
+  &.client-card {
+    .profile-avatar-wrapper {
+      background: linear-gradient(135deg, #4f46e5, #06b6d4);
+      animation: $client-glow-pulse;
+      img.profile {
+        border-color: #1e1b19 !important;
+      }
+      .account-badge {
+        border-color: #1e1b19 !important;
+        background: linear-gradient(135deg, #4f46e5, #06b6d4);
+      }
+    }
+    .userserviceDetail-container-detail {
+      border-top: none;
+      padding-top: 0.5rem;
+    }
+  }
+
+  .userserviceDetail-container {
+    .userserviceDetail-container-detail,
+    .userserviceDetail-container-rating {
+      border-top-color: rgba(255, 255, 255, 0.06);
+    }
+    .userserviceDetail-container-rate {
+      background: rgba(255, 255, 255, 0.04);
+      &.no-ratings {
+        background: rgba(255, 255, 255, 0.02);
+        .no-ratings-text {
+          color: darken($font-color-dark, 25%);
+        }
+      }
+    }
+    .TextBorder {
+      .TextBorder-container {
+        background-color: rgba(255, 255, 255, 0.02);
+        border-color: rgba(255, 255, 255, 0.01);
+        color: $font-color-dark;
+
+        .TextBorder-container-label {
+          background: rgba(255, 127, 0, 0.15);
+        }
+
+        .TextBorder-container-text {
+          color: darken($font-color-dark, 10%);
+        }
+      }
+    }
+  }
 }
 
+// Action Tabs Container (Segmented Apple-style Control)
 .serviceDetail-container {
   display: flex;
-  margin: $spacing-unit 1rem;
+  background: rgba(0, 0, 0, 0.03);
+  padding: 0.4rem;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.02);
+  gap: 0.2rem;
+  margin-bottom: 2.5rem;
+  width: max-content;
+
   button {
-    margin-right: $spacing_unit;
+    padding: 0.6rem 1.3rem;
+    font-size: 0.92rem;
+    font-weight: 700;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    background-color: transparent;
+    color: lighten($font-color-light, 20%);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.02);
+      color: $font-color-light;
+    }
+
+    &.disabled {
+      background: #ffffff;
+      color: $accent-color;
+      border-color: transparent;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      cursor: default;
+      
+      &:hover {
+        background: #ffffff;
+        color: $accent-color;
+      }
+    }
   }
-  .disabled {
-    background: none;
-    color: $accent-color;
-    border: 1px solid $accent-color;
+}
+
+.ProfileContainer.dark {
+  .serviceDetail-container {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.02);
+    button {
+      color: darken($font-color-dark, 20%);
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.02);
+        color: $font-color-dark;
+      }
+      &.disabled {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      }
+    }
+  }
+}
+
+// Media Queries for Mobile Responsiveness
+@include breakpoint-small($tablet-breakpoint) {
+  .ProfileContainer {
+    .profile-dashboard-tabs-wrapper {
+      margin: 1.5rem auto 0 auto;
+      padding: 0 1rem;
+      
+      .serviceDetail-container {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-bottom: 0;
+        gap: 0.2rem;
+        
+        button {
+          padding: 0.5rem 0.8rem;
+          font-size: 0.82rem;
+        }
+      }
+    }
+
+    .ProfileContainer-container {
+      flex-direction: column;
+      gap: 1.5rem;
+      padding: 0 1rem;
+      margin: 1.5rem 0;
+      
+      .ProfileContainer-container-left,
+      .ProfileContainer-container-right {
+        width: 100%;
+      }
+      .ProfileContainer-container-right {
+        padding: 1.5rem;
+      }
+    }
   }
 }

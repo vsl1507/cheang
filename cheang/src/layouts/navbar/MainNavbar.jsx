@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import { useLanguage } from "../../context/LanguageContext";
 import { useTheme } from "../../context/ThemeContext";
 import Logo from "../../assets/logo.png";
@@ -21,6 +21,11 @@ import LanguageSelector from "../../components/languageSelector/LanguageSelector
 import ThemeSelector from "../../components/themeSelector/ThemeSelector";
 import Profile from "../../components/profile/Profile";
 import { FaBars, FaTimes } from "react-icons/fa";
+import {
+  signOutUserStart,
+  signOutUserSuccess,
+  signOutUserFailure,
+} from "../../redux/user/userSlice";
 import "./MainNavbar.scss";
 
 const MainNavbar = ({ page }) => {
@@ -28,6 +33,9 @@ const MainNavbar = ({ page }) => {
   const { theme } = useTheme();
   const { language, changeLanguage } = useLanguage();
   const [showMenu, setShowMenu] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleLanguageChange = (newLanguage) => {
     changeLanguage(newLanguage);
@@ -36,6 +44,35 @@ const MainNavbar = ({ page }) => {
   const toggleMenu = () => {
     setShowMenu(!showMenu);
   };
+
+  const toggleDropdown = (e) => {
+    e.stopPropagation();
+    setShowDropdown(!showDropdown);
+  };
+
+  const handleSignOut = async () => {
+    try {
+      dispatch(signOutUserStart());
+      const res = await fetch("/api/auth/signout");
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(signOutUserFailure(data.message));
+        return;
+      }
+      localStorage.removeItem("authToken");
+      dispatch(signOutUserSuccess());
+      setShowDropdown(false);
+      navigate("/");
+    } catch (error) {
+      dispatch(signOutUserFailure(error.message));
+    }
+  };
+
+  useEffect(() => {
+    const closeDropdown = () => setShowDropdown(false);
+    window.addEventListener("click", closeDropdown);
+    return () => window.removeEventListener("click", closeDropdown);
+  }, []);
 
   // Close menu when resizing to desktop
   useEffect(() => {
@@ -126,9 +163,51 @@ const MainNavbar = ({ page }) => {
                     {getBecomePro(language)}
                   </NavLink>
                 )}
-                <NavLink to="/profile" className="avatar-link" onClick={() => setShowMenu(false)}>
-                  <Profile src={currentUser.avatar} />
-                </NavLink>
+                
+                {/* Circular Profile Avatar with Dropdown */}
+                <div className="profile-dropdown-wrapper">
+                  <div className="avatar-trigger" onClick={toggleDropdown}>
+                    <Profile src={currentUser.avatar} />
+                  </div>
+                  {showDropdown && (
+                    <div className={`profile-dropdown-menu ${theme}`}>
+                      <div className="dropdown-user-info">
+                        <span className="dropdown-username">{currentUser.nameuser}</span>
+                        <span className="dropdown-email">{currentUser.email}</span>
+                      </div>
+                      <div className="dropdown-divider"></div>
+                      <NavLink 
+                        to="/profile" 
+                        state={{ activeTab: "about" }} 
+                        className="dropdown-menu-item"
+                        onClick={() => setShowDropdown(false)}
+                      >
+                        Profile Info
+                      </NavLink>
+                      <NavLink 
+                        to="/profile" 
+                        state={{ activeTab: "setting" }} 
+                        className="dropdown-menu-item"
+                        onClick={() => setShowDropdown(false)}
+                      >
+                        Settings
+                      </NavLink>
+                      {(currentUser.admin || currentUser.isAdmin) && (
+                        <NavLink 
+                          to="/admin/dashboard" 
+                          className="dropdown-menu-item"
+                          onClick={() => setShowDropdown(false)}
+                        >
+                          Admin Dashboard
+                        </NavLink>
+                      )}
+                      <div className="dropdown-divider"></div>
+                      <button className="dropdown-menu-item logout-btn" onClick={handleSignOut}>
+                        Sign Out
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             ) : (
               <NavLink to="/signup" className="signup-outline-btn" onClick={() => setShowMenu(false)}>

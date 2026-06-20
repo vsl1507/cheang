@@ -35,7 +35,7 @@ const ServiceSelectorUser = () => {
         setShowServiceError(true);
         return;
       }
-      setUserSerivce(data);
+      setUserSerivce(data.data || data);
     } catch (error) {
       setShowServiceError(true);
     }

@@ -176,7 +176,7 @@ const SettingsPage = () => {
         dispatch(updateUserFailure(data.message));
         showToast(getTranslation("errorSave"), "error");
       } else {
-        dispatch(updateUserSuccess(data));
+        dispatch(updateUserSuccess(data.data || data));
         showToast(getTranslation("successSave"), "success");
       }
     } catch (err) {

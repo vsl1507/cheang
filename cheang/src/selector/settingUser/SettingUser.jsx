@@ -17,10 +17,22 @@ import {
   updateUserSuccess,
 } from "../../redux/user/userSlice";
 import Label from "../../components/label/Label";
-import FormField from "../../components/formField/FormField";
-import { FaSave, FaSignOutAlt, FaTrash, FaBriefcase, FaTools, FaMapMarkerAlt, FaCity } from "react-icons/fa";
+import {
+  FaSave,
+  FaSignOutAlt,
+  FaTrash,
+  FaBriefcase,
+  FaTools,
+  FaMapMarkerAlt,
+  FaCity,
+  FaEnvelope,
+  FaLock,
+  FaUser,
+  FaPhone,
+  FaCamera,
+  FaExclamationTriangle,
+} from "react-icons/fa";
 import Profile from "../../components/profile/Profile";
-import FormatDate from "../../utils/FormatDate";
 import "./SettingUser.scss";
 import { getProvincesAndCities } from "../../data/Location";
 import { getServicesAndSubServices } from "../../data/Service";
@@ -36,63 +48,55 @@ import {
 import { app } from "../../firebase";
 
 const SettingUser = () => {
-  ///////AccountSetting/////////
-
-  //////ProfileSetting////////
   const { theme } = useTheme();
   const { language } = useLanguage();
+  const dispatch = useDispatch();
   const fileRef = useRef(null);
+
   const { currentUser, loading, error } = useSelector((state) => state.user);
   const [file, setFile] = useState(undefined);
   const [filePerc, setFilePerc] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
   const [updateSuccess, setUpdateSuccess] = useState(false);
-  const dispatch = useDispatch();
 
-  //Location
+  // Location mapping
   const locationLanguage = getProvincesAndCities(language);
   const locationEnglsih = getProvincesAndCities("en");
 
-  //Varaible location
   const [selectedProvince, setSelectedProvince] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
 
-  //Handle change for province
   const handleProvinceChange = (event) => {
     setSelectedProvince(event.target.value);
     const index = locationLanguage.Provinces.indexOf(event.target.value);
     setSelectedCity("");
     setFormData({
       ...formData,
-      province: locationEnglsih.Provinces[index], // Set the province in formData
-      city: "", // Reset city in formData
+      province: locationEnglsih.Provinces[index],
+      city: "",
     });
   };
 
-  //Handle change for city
   const handleCityChange = (event) => {
     setSelectedCity(event.target.value);
     const index = locationLanguage.Provinces.indexOf(selectedProvince);
     const subCityArray = locationLanguage.Cities[selectedProvince];
     const indexCity = subCityArray.indexOf(event.target.value);
-    const value =
-      locationEnglsih.Cities[locationEnglsih.Provinces[index]][indexCity];
+    const value = locationEnglsih.Cities[locationEnglsih.Provinces[index]][indexCity];
     setFormData({
       ...formData,
       city: value,
     });
   };
 
-  //Service
+  // Service mapping
   const servicesLanguage = getServicesAndSubServices(language);
   const servicesEnglsih = getServicesAndSubServices("en");
 
-  //Variable for main & sub service
   const [selectedMainService, setSelectedMainService] = useState("");
   const [selectedSubService, setSelectedSubService] = useState("");
 
-  //Handle change for main service
   const handleMainServiceChange = (event) => {
     setSelectedMainService(event.target.value);
     const index = servicesLanguage.MainService.indexOf(event.target.value);
@@ -104,29 +108,62 @@ const SettingUser = () => {
     });
   };
 
-  //Handle change for sub service
   const handleSubServiceChange = (event) => {
     setSelectedSubService(event.target.value);
     const index = servicesLanguage.MainService.indexOf(selectedMainService);
     const subServiceArray = servicesLanguage.SubService[selectedMainService];
     const indexSub = subServiceArray.indexOf(event.target.value);
-    const value =
-      servicesEnglsih.SubService[servicesEnglsih.MainService[index]][indexSub];
+    const value = servicesEnglsih.SubService[servicesEnglsih.MainService[index]][indexSub];
     setFormData({
       ...formData,
       subService: value,
     });
   };
-  /////////////
-  //useEffect
+
   useEffect(() => {
     if (file) {
       handleFileUpload(file);
     }
   }, [file]);
 
-  //Upload file iamge
+  // Prepopulate selections
+  useEffect(() => {
+    if (currentUser) {
+      if (currentUser.province) {
+        const index = locationEnglsih.Provinces.indexOf(currentUser.province);
+        if (index !== -1) {
+          const provLang = locationLanguage.Provinces[index];
+          setSelectedProvince(provLang);
+          if (currentUser.city) {
+            const citiesEng = locationEnglsih.Cities[currentUser.province] || [];
+            const cityIndex = citiesEng.indexOf(currentUser.city);
+            if (cityIndex !== -1) {
+              const citiesLang = locationLanguage.Cities[provLang] || [];
+              setSelectedCity(citiesLang[cityIndex] || "");
+            }
+          }
+        }
+      }
+      if (currentUser.mainService) {
+        const index = servicesEnglsih.MainService.indexOf(currentUser.mainService);
+        if (index !== -1) {
+          const mainLang = servicesLanguage.MainService[index];
+          setSelectedMainService(mainLang);
+          if (currentUser.subService) {
+            const subsEng = servicesEnglsih.SubService[currentUser.mainService] || [];
+            const subIndex = subsEng.indexOf(currentUser.subService);
+            if (subIndex !== -1) {
+              const subsLang = servicesLanguage.SubService[mainLang] || [];
+              setSelectedSubService(subsLang[subIndex] || "");
+            }
+          }
+        }
+      }
+    }
+  }, [currentUser, language]);
+
   const handleFileUpload = (file) => {
+    setFileUploadError(false);
     const storage = getStorage(app);
     const fileName = new Date().getTime() + file.name;
     const storageRef = ref(storage, fileName);
@@ -134,8 +171,7 @@ const SettingUser = () => {
     uploadTask.on(
       "state_changed",
       (snapshot) => {
-        const progress =
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
         setFilePerc(Math.round(progress));
       },
       (error) => {
@@ -143,18 +179,16 @@ const SettingUser = () => {
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) =>
-          setFormData({ ...formData, avatar: downloadURL })
+          setFormData((prev) => ({ ...prev, avatar: downloadURL }))
         );
       }
     );
   };
 
-  //Catch value
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  //Update Account
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -171,15 +205,15 @@ const SettingUser = () => {
         dispatch(updateUserFailure(data.message));
         return;
       }
-      dispatch(updateUserSuccess(data));
+      dispatch(updateUserSuccess(data.data || data));
       setUpdateSuccess(true);
-    } catch (error) {
-      dispatch(updateUserFailure(error.message));
+      setTimeout(() => setUpdateSuccess(false), 3000);
+    } catch (err) {
+      dispatch(updateUserFailure(err.message));
       setUpdateSuccess(false);
     }
   };
 
-  //Delete Account
   const handleDeleteUser = async () => {
     handleCloseDeleteModal();
     try {
@@ -193,21 +227,15 @@ const SettingUser = () => {
         return;
       }
       dispatch(deleteUserSuccess(data));
-    } catch (error) {
-      dispatch(deleteUserFailure(error.message));
+    } catch (err) {
+      dispatch(deleteUserFailure(err.message));
     }
   };
 
-  //Asking befoe Delete Account
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const handleShowDeleteModal = () => {
-    setShowDeleteModal(true);
-  };
-  const handleCloseDeleteModal = () => {
-    setShowDeleteModal(false);
-  };
+  const handleShowDeleteModal = () => setShowDeleteModal(true);
+  const handleCloseDeleteModal = () => setShowDeleteModal(false);
 
-  //Signout Account
   const handleSignOut = async () => {
     try {
       dispatch(signOutUserStart());
@@ -217,117 +245,149 @@ const SettingUser = () => {
         dispatch(deleteUserFailure(data.message));
         return;
       }
-      // Clear the token from localStorage
       localStorage.removeItem("authToken");
       dispatch(deleteUserSuccess(data));
-    } catch (error) {
-      dispatch(deleteUserFailure(error.message));
+    } catch (err) {
+      dispatch(deleteUserFailure(err.message));
     }
   };
 
-  //Create varaible to store date from usercurrent
-  const dateObject = new Date(currentUser.createdAt);
+  // Translations
+  const t = {
+    title: { en: "Account Settings", kh: "ការកំណត់គណនី", zh: "账户设置" },
+    subtitle: { 
+      en: "Update your profile details, change security credentials, or manage your account status.", 
+      kh: "ធ្វើបច្ចុប្បន្នភាពព័ត៌មានប្រវត្តិរូប ប្តូរលេខសម្ងាត់ ឬគ្រប់គ្រងគណនីរបស់អ្នក។", 
+      zh: "更新您的个人资料详细信息、更改安全凭证或管理您的账户状态。" 
+    },
+    profileSection: { en: "Profile Details", kh: "ប្រវត្តិរូបអាជីវកម្ម", zh: "个人资料设置" },
+    credentialsSection: { en: "Security Credentials", kh: "គណនីសុវត្ថិភាព", zh: "安全凭证设置" },
+    dangerSection: { en: "Danger Zone", kh: "តំបន់គ្រោះថ្នាក់", zh: "危险区域" },
+    emailLabel: { en: "Email Address", kh: "អាសយដ្ឋានអ៊ីមែល", zh: "电子邮箱" },
+    passwordLabel: { en: "Password", kh: "លេខសម្ងាត់", zh: "密码" },
+    nameLabel: { en: "Full Name", kh: "ឈ្មោះពេញ", zh: "姓名" },
+    brandLabel: { en: "Brand / Business Name", kh: "ឈ្មោះអាជីវកម្ម", zh: "品牌 / 业务名称" },
+    phoneLabel: { en: "Phone Number", kh: "លេខទូរស័ព្ទ", zh: "电话号码" },
+    saveBtn: { en: "Save Settings", kh: "រក្សាទុកការផ្លាស់ប្តូរ", zh: "保存修改" },
+    signOutBtn: { en: "Sign Out", kh: "ចាកចេញ", zh: "退出登录" },
+    deleteBtn: { en: "Delete Account", kh: "លុបគណនី", zh: "删除账户" },
+    confirmDeleteTitle: { en: "Delete Account Permanently?", kh: "តើអ្នកចង់លុបគណនីជារៀងរហូតមែនទេ?", zh: "永久删除账户？" },
+    confirmDeleteText: {
+      en: "Are you sure you want to delete your account? This action is permanent and cannot be undone.",
+      kh: "តើអ្នកប្រាកដជាចង់លុបគណនីរបស់អ្នកមែនទេ? សកម្មភាពនេះនឹងលុបជារៀងរហូត ហើយមិនអាចត្រឡប់ក្រោយបានឡើយ។",
+      zh: "您确定要删除您的账户吗？此操作永久生效且无法撤销。",
+    },
+    cancel: { en: "Cancel", kh: "បោះបង់", zh: "取消" },
+    delete: { en: "Delete", kh: "លុប", zh: "删除" },
+    uploading: { en: "Uploading image...", kh: "កំពុងបញ្ចូលរូបភាព...", zh: "正在上传..." },
+    uploadSuccess: { en: "Avatar updated!", kh: "រូបភាពគណនីបានផ្លាស់ប្តូរ!", zh: "头像更新成功！" },
+    uploadError: { en: "Upload failed (Max 2MB)", kh: "ការបញ្ចូលរូបភាពបរាជ័យ (ទំហំធំបំផុត 2MB)", zh: "上传失败（最大 2MB）" },
+    updateSuccessText: { en: "Settings updated successfully!", kh: "ការកំណត់ត្រូវបានរក្សាទុកដោយជោគជ័យ!", zh: "设置更新成功！" },
+  };
+
+  const getLabel = (key) => t[key]?.[language] || t[key]?.["en"];
+
+  if (!currentUser) return null;
+
   return (
-    <>
-      <div className={`addService ${theme}`}>
-        <div className="form-addService-container">
-          <Label label="Account Setting" />
-          <form className="form-addService-field" onSubmit={handleSubmit}>
-            <div className="form-addService-input">
-              <FormField
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder={currentUser.email}
-              />
-              <FormField
-                type="passowrd"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Password"
-              />
-              {error ? <p style={{ color: "red" }}>{error}</p> : ""}
-              <div className="btn-actions">
-                <button>{<FaSave style={{ marginRight: "8px" }} />}Save</button>
+    <div className={`settings-page-container ${theme}`}>
+      {/* Header */}
+      <header className="settings-page-header">
+        <h1 className="header-title">{getLabel("title")}</h1>
+        <p className="header-subtitle">{getLabel("subtitle")}</p>
+      </header>
+
+      {/* Main Settings Panel */}
+      <div className="settings-content-layout">
+        
+        {/* PROFILE SETTINGS CARD */}
+        <section className="settings-section-card">
+          <div className="section-header">
+            <Label label={getLabel("profileSection")} />
+          </div>
+          
+          <form className="settings-form" onSubmit={handleSubmit}>
+            {/* Avatar Row */}
+            <div className="avatar-settings-row">
+              <div className="avatar-preview-box" onClick={() => fileRef.current.click()}>
+                <Profile src={formData?.avatar || currentUser.avatar} />
+                <div className="avatar-camera-overlay">
+                  <FaCamera />
+                </div>
+                <input
+                  type="file"
+                  onChange={(e) => setFile(e.target.files[0])}
+                  ref={fileRef}
+                  hidden
+                  accept="image/*"
+                />
+              </div>
+              <div className="avatar-status-info">
+                {filePerc > 0 && filePerc < 100 && (
+                  <span className="upload-status info">{getLabel("uploading")} {filePerc}%</span>
+                )}
+                {filePerc === 100 && !fileUploadError && (
+                  <span className="upload-status success">{getLabel("uploadSuccess")}</span>
+                )}
+                {fileUploadError && (
+                  <span className="upload-status error">{getLabel("uploadError")}</span>
+                )}
               </div>
             </div>
-          </form>
-        </div>
-      </div>
-      {currentUser.userPro ? (
-        <div className={`addService ${theme}`}>
-          <div className="form-addService-container">
-            <Label label="Profile Setting" />
-            <form className="form-addService-field" onSubmit={handleSubmit}>
-              {/* Image */}
-              <input
-                type="file"
-                onChange={(e) => setFile(e.target.files[0])}
-                ref={fileRef}
-                hidden
-                accept="image/*"
-              />
 
-              <Profile
-                onClick={() => fileRef.current.click()}
-                src={formData?.avatar || currentUser.avatar}
-              />
-              <div>
-                <p>
-                  {fileUploadError ? (
-                    <span style={{ color: "red" }}>
-                      Error Image upload (image must be less than 2 mb)
-                    </span>
-                  ) : filePerc === 100 ? (
-                    <span style={{ color: "green" }}>
-                      Image successfully uploaded!
-                    </span>
-                  ) : (
-                    ""
-                  )}
-                </p>
-              </div>
-
-              {/* Input */}
-              <div className="form-addService-input">
-                <FormField
+            {/* Inputs Grid */}
+            <div className="settings-inputs-grid">
+              <div className="input-group">
+                <span className="input-icon"><FaUser /></span>
+                <input
                   type="text"
                   name="nameuser"
-                  value={formData.nameuser}
+                  value={formData.nameuser !== undefined ? formData.nameuser : currentUser.nameuser}
                   onChange={handleChange}
-                  placeholder={currentUser.nameuser}
+                  placeholder={getLabel("nameLabel")}
                 />
-                <FormField
-                  type="text"
-                  name="brandName"
-                  value={formData.brandName}
-                  onChange={handleChange}
-                  placeholder={currentUser.brandName}
-                />
+              </div>
 
-                <div className="select">
-                  <CustomSelect
-                    value={selectedMainService}
-                    onChange={handleMainServiceChange}
-                    options={servicesLanguage.MainService}
-                    placeholder={getSelect(language) + " " + getMainService(language)}
-                    icon={<FaBriefcase />}
-                  />
-
-                  <CustomSelect
-                    value={selectedSubService}
-                    onChange={handleSubServiceChange}
-                    options={servicesLanguage.SubService[selectedMainService] || []}
-                    placeholder={getSelect(language) + " " + getSubService(language)}
-                    icon={<FaTools />}
-                    disabled={!selectedMainService}
+              {currentUser.userPro && (
+                <div className="input-group">
+                  <span className="input-icon"><FaBriefcase /></span>
+                  <input
+                    type="text"
+                    name="brandName"
+                    value={formData.brandName !== undefined ? formData.brandName : currentUser.brandName || ""}
+                    onChange={handleChange}
+                    placeholder={getLabel("brandLabel")}
                   />
                 </div>
- 
-                {/* Select Location */}
-                <div className="select">
+              )}
+
+              {currentUser.userPro && (
+                <div className="select-row-group">
+                  <div className="custom-select-wrapper">
+                    <CustomSelect
+                      value={selectedMainService}
+                      onChange={handleMainServiceChange}
+                      options={servicesLanguage.MainService}
+                      placeholder={getSelect(language) + " " + getMainService(language)}
+                      icon={<FaBriefcase />}
+                    />
+                  </div>
+
+                  <div className="custom-select-wrapper">
+                    <CustomSelect
+                      value={selectedSubService}
+                      onChange={handleSubServiceChange}
+                      options={servicesLanguage.SubService[selectedMainService] || []}
+                      placeholder={getSelect(language) + " " + getSubService(language)}
+                      icon={<FaTools />}
+                      disabled={!selectedMainService}
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="select-row-group">
+                <div className="custom-select-wrapper">
                   <CustomSelect
                     value={selectedProvince}
                     onChange={handleProvinceChange}
@@ -335,7 +395,9 @@ const SettingUser = () => {
                     placeholder={getSelect(language) + " " + getProvince(language)}
                     icon={<FaMapMarkerAlt />}
                   />
+                </div>
 
+                <div className="custom-select-wrapper">
                   <CustomSelect
                     value={selectedCity}
                     onChange={handleCityChange}
@@ -345,124 +407,123 @@ const SettingUser = () => {
                     disabled={!selectedProvince}
                   />
                 </div>
+              </div>
 
-                <FormField
+              <div className="input-group">
+                <span className="input-icon"><FaPhone /></span>
+                <input
                   type="text"
                   name="phone"
-                  value={formData.phone}
+                  value={formData.phone !== undefined ? formData.phone : currentUser.phone || ""}
                   onChange={handleChange}
-                  placeholder={currentUser.phone}
+                  placeholder={getLabel("phoneLabel")}
                 />
-
-                <div className="btn-actions">
-                  <button>
-                    {<FaSave style={{ marginRight: "8px" }} />}
-                    Save
-                  </button>
-                </div>
               </div>
-            </form>
-            <div className="btn-actions">
-              <button onClick={handleShowDeleteModal}>
-                {<FaTrash style={{ marginRight: "8px" }} />}
-                Delete Account
+            </div>
+
+            {error && <div className="error-message-box">{error}</div>}
+            {updateSuccess && <div className="success-message-box">{getLabel("updateSuccessText")}</div>}
+
+            <div className="form-submit-row">
+              <button type="submit" className="save-settings-btn" disabled={loading}>
+                <FaSave />
+                <span>{getLabel("saveBtn")}</span>
               </button>
-              <button onClick={handleSignOut}>
-                {<FaSignOutAlt style={{ marginRight: "8px" }} />}
-                Sign Out
+            </div>
+          </form>
+        </section>
+
+        {/* SECURITY CREDENTIALS CARD */}
+        <section className="settings-section-card">
+          <div className="section-header">
+            <Label label={getLabel("credentialsSection")} />
+          </div>
+
+          <form className="settings-form" onSubmit={handleSubmit}>
+            <div className="settings-inputs-grid">
+              <div className="input-group">
+                <span className="input-icon"><FaEnvelope /></span>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email !== undefined ? formData.email : currentUser.email}
+                  onChange={handleChange}
+                  placeholder={getLabel("emailLabel")}
+                />
+              </div>
+
+              <div className="input-group">
+                <span className="input-icon"><FaLock /></span>
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password || ""}
+                  onChange={handleChange}
+                  placeholder={getLabel("passwordLabel")}
+                />
+              </div>
+            </div>
+
+            {error && <div className="error-message-box">{error}</div>}
+            {updateSuccess && <div className="success-message-box">{getLabel("updateSuccessText")}</div>}
+
+            <div className="form-submit-row">
+              <button type="submit" className="save-settings-btn" disabled={loading}>
+                <FaSave />
+                <span>{getLabel("saveBtn")}</span>
+              </button>
+            </div>
+          </form>
+        </section>
+
+        {/* DANGER ZONE CARD */}
+        <section className="settings-section-card danger-zone-card">
+          <div className="section-header">
+            <Label label={getLabel("dangerSection")} />
+          </div>
+          
+          <div className="danger-zone-details">
+            <div className="danger-alert-box">
+              <FaExclamationTriangle className="alert-icon" />
+              <p>{getLabel("confirmDeleteText")}</p>
+            </div>
+            
+            <div className="danger-buttons-row">
+              <button className="btn-signout" onClick={handleSignOut}>
+                <FaSignOutAlt />
+                <span>{getLabel("signOutBtn")}</span>
+              </button>
+              <button className="btn-delete-account" onClick={handleShowDeleteModal}>
+                <FaTrash />
+                <span>{getLabel("deleteBtn")}</span>
               </button>
             </div>
           </div>
-          {showDeleteModal && (
-            <div className="delete-modal">
-              <div className="delete-modal-content">
-                <p>Are you sure you want to delete your account?</p>
-                <div className="delete-modal-buttons">
-                  <button onClick={handleCloseDeleteModal}>Cancel</button>
-                  <button onClick={handleDeleteUser}>
-                    {<FaTrash style={{ marginRight: "8px" }} />}Delete
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className={`addService ${theme}`}>
-          <div className="form-addService-container">
-            <Label label="Profile Setting" />
-            <form className="form-addService-field" onSubmit={handleSubmit}>
-              {/* Image */}
-              <input
-                type="file"
-                onChange={(e) => setFile(e.target.files[0])}
-                ref={fileRef}
-                hidden
-                accept="image/*"
-              />
-              <Profile
-                onClick={() => fileRef.current.click()}
-                src={formData?.avatar || currentUser.avatar}
-              />
-              <p>
-                {fileUploadError ? (
-                  <span style={{ color: "red" }}>
-                    Error Image upload (image must be less than 2 mb)
-                  </span>
-                ) : filePerc === 100 ? (
-                  <span style={{ color: "green" }}>
-                    Image successfully uploaded!
-                  </span>
-                ) : (
-                  ""
-                )}
-              </p>
-              {/* Input */}
-              <div className="form-addService-input">
-                {/* <p style={{ color: "#ff7f00" }}>{FormatDate(dateObject)}</p> */}
-                <FormField
-                  type="text"
-                  name="nameuser"
-                  value={formData.nameuser}
-                  onChange={handleChange}
-                  placeholder={currentUser.nameuser}
-                />
+        </section>
+      </div>
 
-                <div className="btn-actions">
-                  <button>
-                    {<FaSave style={{ marginRight: "8px" }} />}
-                    Save
-                  </button>
-                </div>
-              </div>
-            </form>
-            <div className="btn-actions">
-              <button onClick={handleSignOut}>
-                {<FaSignOutAlt style={{ marginRight: "8px" }} />}
-                Sign Out
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="pro-modal-overlay">
+          <div className="pro-modal-wrapper confirmation-modal">
+            <div className="modal-icon warning">
+              <FaExclamationTriangle />
+            </div>
+            <h3>{getLabel("confirmDeleteTitle")}</h3>
+            <p>{getLabel("confirmDeleteText")}</p>
+            <div className="modal-buttons">
+              <button className="btn-modal-cancel" onClick={handleCloseDeleteModal}>
+                {getLabel("cancel")}
               </button>
-              <button onClick={handleShowDeleteModal}>
-                {<FaTrash style={{ marginRight: "8px" }} />}
-                Delete Account
+              <button className="btn-modal-delete" onClick={handleDeleteUser}>
+                <FaTrash style={{ marginRight: "6px" }} />
+                {getLabel("delete")}
               </button>
             </div>
           </div>
-          {showDeleteModal && (
-            <div className="delete-modal">
-              <div className="delete-modal-content">
-                <p>Are you sure you want to delete your account?</p>
-                <div className="delete-modal-buttons">
-                  <button onClick={handleCloseDeleteModal}>Cancel</button>
-                  <button onClick={handleDeleteUser}>
-                    {<FaTrash style={{ marginRight: "8px" }} />}Delete
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       )}
-    </>
+    </div>
   );
 };
 

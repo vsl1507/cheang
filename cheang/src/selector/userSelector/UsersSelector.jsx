@@ -30,7 +30,7 @@ const UsersSelector = () => {
         if (data.success === false) {
           setError(data.message);
         }
-        setUsers(data);
+        setUsers(data.data || data);
         setLoading(false);
       };
       fetchUsers();
@@ -47,7 +47,7 @@ const UsersSelector = () => {
         if (data.success === false) {
           setError(data.message);
         }
-        setUsers(data);
+        setUsers(data.data || data);
         setLoading(false);
       };
       fetchUserswithCrrunetUser();

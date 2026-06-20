@@ -1,17 +1,15 @@
 import { useTheme } from "../../context/ThemeContext";
-import TextBorder from "../../components/textBorder/TextBorder";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Label from "../../components/label/Label";
 import {
-  FaCalendar,
-  FaGoogle,
-  FaLocationArrow,
-  FaMapMarkedAlt,
-  FaMarsStroke,
-  FaPhone,
+  FaCalendarAlt,
+  FaEnvelope,
+  FaMapMarkerAlt,
+  FaPhoneAlt,
   FaUserAlt,
   FaWrench,
+  FaBriefcase,
 } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import "./AboutUser.scss";
@@ -23,10 +21,14 @@ const AboutUser = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const { currentUser } = useSelector((state) => state.user);
-  const [user, setUser] = useState([]);
+  const [user, setUser] = useState(null);
   const params = useParams();
 
   useEffect(() => {
+    if (!params.userId) {
+      setUser(null);
+      return;
+    }
     const fetchService = async () => {
       try {
         setLoading(true);
@@ -37,7 +39,7 @@ const AboutUser = () => {
           setLoading(false);
           return;
         }
-        setUser(data);
+        setUser(data.data || data);
         setLoading(false);
         setError(false);
       } catch (error) {
@@ -48,127 +50,90 @@ const AboutUser = () => {
     fetchService();
   }, [params.userId]);
 
-  //Create varaible to store date from usercurrent
-  const dateCurrentUsesr = new Date(currentUser.createdAt);
-  const dateUser = new Date(user.createdAt);
+  const displayUser = user || currentUser;
+  if (!displayUser) return null;
+
+  const isPro = displayUser.userPro;
+  const joinDate = displayUser.createdAt ? new Date(displayUser.createdAt) : null;
 
   return (
-    <>
-      {loading && <p className="">Loading...</p>}
-      {user.length !== 0 ? (
-        <div className={`service-about ${theme}`}>
-          <Label label="About Me" />
-          <div className="serivce-about-container" key={user.id}>
-            <TextBorder
-              label={<FaMapMarkedAlt />}
-              text={"Brand Name : " + (user.brandName || "None")}
-            />
-            <TextBorder
-              label={<FaUserAlt />}
-              text={"Owner : " + user.nameuser}
-            />
-            <TextBorder
-              label={<FaLocationArrow />}
-              text={
-                "Location : " + (user.province + " , " + user.city || "None")
-              }
-            />
-            <TextBorder
-              label={<FaWrench />}
-              text={
-                "Type of Service : " +
-                (user.mainService + " , " + user.subService || "None")
-              }
-            />
-            <TextBorder
-              label={<FaPhone />}
-              text={"Phone Number : " + (user.phone || "None")}
-            />
-            <TextBorder
-              label={<FaCalendar />}
-              text={"Join : " + (FormatDate(dateUser) || "None")}
-            />
-          </div>
-        </div>
-      ) : (
+    <div className={`service-about ${theme}`}>
+      {loading && <p className="loading-text">Loading details...</p>}
+      {!loading && (
         <>
-          {currentUser.userPro ? (
-            <div className={`service-about ${theme}`}>
-              <Label label="About Me" />
-              <div className="serivce-about-container" key={currentUser.id}>
-                <TextBorder
-                  label={<FaMapMarkedAlt />}
-                  text={"Brand Name : " + (currentUser.brandName || "None")}
-                />
-                <TextBorder
-                  label={<FaUserAlt />}
-                  text={"Owner : " + currentUser.nameuser}
-                />
-                <TextBorder
-                  label={<FaGoogle />}
-                  text={"Email : " + (currentUser.email || "None")}
-                />
-                <TextBorder
-                  label={<FaLocationArrow />}
-                  text={
-                    "Location : " +
-                    (currentUser.city + " , " + currentUser.province || "None")
-                  }
-                />
-                <TextBorder
-                  label={<FaWrench />}
-                  text={
-                    "Type of Service : " +
-                    (currentUser.mainService + " , " + currentUser.subService ||
-                      "None")
-                  }
-                />
-                <TextBorder
-                  label={<FaPhone />}
-                  text={"Phone Number : " + (currentUser.phone || "None")}
-                />
-                <TextBorder
-                  label={<FaCalendar />}
-                  text={"Join : " + (FormatDate(dateCurrentUsesr) || "None")}
-                />
+          <Label label={isPro ? "About the Provider" : "About Me"} />
+          <div className="service-about-grid">
+            {isPro && (
+              <div className="about-card">
+                <div className="about-icon"><FaBriefcase /></div>
+                <div className="about-info">
+                  <span className="about-label">Brand Name</span>
+                  <span className="about-value">{displayUser.brandName || "Not specified"}</span>
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className={`service-about ${theme}`}>
-              <Label label="About Me" />
-              <div className="serivce-about-container" key={currentUser.id}>
-                <TextBorder
-                  label={<FaMapMarkedAlt />}
-                  text="Brand Name : None"
-                />
-                <TextBorder
-                  label={<FaUserAlt />}
-                  text={"Owner : " + currentUser.nameuser}
-                />
-                <TextBorder
-                  label={<FaGoogle />}
-                  text={"Email : " + (currentUser.email || "None")}
-                />
-                <TextBorder
-                  label={<FaLocationArrow />}
-                  text="Location : None"
-                />
-                <TextBorder
-                  label={<FaWrench />}
-                  text="Type of Service : None"
-                />
-                <TextBorder label={<FaPhone />} text="Phone Number : None" />
+            )}
 
-                <TextBorder
-                  label={<FaCalendar />}
-                  text={"Join : " + (FormatDate(dateCurrentUsesr) || "None")}
-                />
+            <div className="about-card">
+              <div className="about-icon"><FaUserAlt /></div>
+              <div className="about-info">
+                <span className="about-label">{isPro ? "Owner / Manager" : "Full Name"}</span>
+                <span className="about-value">{displayUser.nameuser}</span>
               </div>
             </div>
-          )}
+
+            <div className="about-card">
+              <div className="about-icon"><FaEnvelope /></div>
+              <div className="about-info">
+                <span className="about-label">Email Address</span>
+                <span className="about-value">{displayUser.email || "Not public"}</span>
+              </div>
+            </div>
+
+            <div className="about-card">
+              <div className="about-icon"><FaMapMarkerAlt /></div>
+              <div className="about-info">
+                <span className="about-label">Location</span>
+                <span className="about-value">
+                  {displayUser.city || displayUser.province
+                    ? `${displayUser.city || ""}${displayUser.city && displayUser.province ? ", " : ""}${displayUser.province || ""}`
+                    : "Location not set"}
+                </span>
+              </div>
+            </div>
+
+            {isPro && (
+              <div className="about-card">
+                <div className="about-icon"><FaWrench /></div>
+                <div className="about-info">
+                  <span className="about-label">Specialties</span>
+                  <span className="about-value">
+                    {displayUser.mainService || displayUser.subService
+                      ? `${displayUser.mainService || ""}${displayUser.mainService && displayUser.subService ? " - " : ""}${displayUser.subService || ""}`
+                      : "Handyman services"}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            <div className="about-card">
+              <div className="about-icon"><FaPhoneAlt /></div>
+              <div className="about-info">
+                <span className="about-label">Phone Number</span>
+                <span className="about-value">{displayUser.phone || "No phone added"}</span>
+              </div>
+            </div>
+
+            <div className="about-card">
+              <div className="about-icon"><FaCalendarAlt /></div>
+              <div className="about-info">
+                <span className="about-label">Member Since</span>
+                <span className="about-value">{joinDate ? FormatDate(joinDate) : "Recently"}</span>
+              </div>
+            </div>
+          </div>
         </>
       )}
-    </>
+    </div>
   );
 };
 

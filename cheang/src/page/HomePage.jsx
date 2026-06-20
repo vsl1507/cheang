@@ -207,7 +207,7 @@ const HomePage = () => {
         if (data.success === false) {
           setError(data.message);
         } else {
-          setUsers(data);
+          setUsers(data.data || data);
         }
         setLoading(false);
       } catch (err) {
@@ -316,7 +316,7 @@ const HomePage = () => {
       const res = await fetch(apiUrl);
       const data = await res.json();
       
-      setSearchResults(data);
+      setSearchResults(data.data || data);
       setLoading(false);
 
       // Smooth scroll down to results section

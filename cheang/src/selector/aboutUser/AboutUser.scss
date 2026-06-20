@@ -1,12 +1,141 @@
 @import "../../variables";
+
 .service-about {
-  h2 {
-    color: red;
+  width: 100%;
+  animation: fadeInUp 0.5s ease-out forwards;
+
+  .loading-text {
+    font-size: 1rem;
+    font-weight: 600;
+    color: $accent-color;
+    padding: 2rem;
+    text-align: center;
   }
+
   .label-title {
-    padding-left: $spacing_unit;
+    margin-bottom: 2rem;
+    font-size: 1.5rem !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, $font-color-light, lighten($font-color-light, 30%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
-  .serivce-about-container {
-    padding-left: 1rem;
+
+  &.dark .label-title {
+    background: linear-gradient(135deg, $font-color-dark, darken($font-color-dark, 30%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .service-about-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+
+    @include breakpoint-small($mobile-breakpoint) {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  }
+
+  .about-card {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 1.25rem 1.5rem;
+    border-radius: 16px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid transparent;
+
+    &:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    }
+
+    .about-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.8rem;
+      height: 2.8rem;
+      border-radius: 12px;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+      transition: all 0.3s ease;
+    }
+
+    .about-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+
+      .about-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+      }
+
+      .about-value {
+        font-size: 0.98rem;
+        font-weight: 600;
+        line-height: 1.4;
+      }
+    }
+  }
+
+  // Themes
+  &.light {
+    .about-card {
+      background: rgba(0, 0, 0, 0.015);
+      border-color: rgba(0, 0, 0, 0.03);
+
+      &:hover {
+        background: #ffffff;
+        border-color: rgba($accent-color, 0.15);
+      }
+
+      .about-icon {
+        background: rgba($accent-color, 0.08);
+        color: $accent-color;
+      }
+
+      .about-info {
+        .about-label {
+          color: lighten($font-color-light, 35%);
+        }
+        .about-value {
+          color: $font-color-light;
+        }
+      }
+    }
+  }
+
+  &.dark {
+    .about-card {
+      background: rgba(255, 255, 255, 0.015);
+      border-color: rgba(255, 255, 255, 0.03);
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.03);
+        border-color: rgba($accent-color, 0.25);
+      }
+
+      .about-icon {
+        background: rgba($accent-color, 0.15);
+        color: lighten($accent-color, 10%);
+      }
+
+      .about-info {
+        .about-label {
+          color: darken($font-color-dark, 40%);
+        }
+        .about-value {
+          color: $font-color-dark;
+        }
+      }
+    }
   }
 }
