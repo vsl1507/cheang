@@ -15,6 +15,7 @@ import {
 } from "react-icons/fa";
 import ServiceUpdate from "../serviceUpdate/ServiceUpdate";
 import { useNavigate } from "react-router-dom";
+import ServiceCard from "../../components/card/ServiceCard";
 import "./ServiceSelector.scss";
 
 const ServiceSelector = ({ setActiveTab }) => {
@@ -206,44 +207,14 @@ const ServiceSelector = ({ setActiveTab }) => {
         ) : (
           <div className="services-grid">
             {filteredServices.map((service, index) => (
-              <article className="service-card-item" key={service.id || index}>
-                <div className="card-image-wrapper">
-                  <img
-                    src={service.image}
-                    alt={service.name}
-                    onError={(e) => {
-                      e.target.src =
-                        "https://static-00.iconduck.com/assets.00/wrench-icon-2047x2048-jyerjpd9.png";
-                    }}
-                  />
-                  <div className="card-price-overlay">
-                    <span className="price-label">{getLabel("price")}</span>
-                    <span className="price-value">${service.price}</span>
-                  </div>
-                  <div 
-                    className={`status-badge-floating ${service.isActive !== false ? "active" : "draft"}`} 
-                    onClick={() => handleToggleStatus(service.id, service.isActive !== false)}
-                    title="Click to toggle active/draft status"
-                  >
-                    <span className="status-dot"></span>
-                    <span className="status-text">{service.isActive !== false ? getLabel("activeStatus") : getLabel("draftStatus")}</span>
-                  </div>
-                </div>
-
-                <div className="card-content-body">
-                  <h3 className="service-item-title">{service.name}</h3>
-                  <p className="service-item-desc">{service.description}</p>
-                </div>
-
-                <div className="card-actions-footer">
-                  <button className="btn-edit" onClick={() => handleOpenEditModal(service.id)}>
-                    <FaPenAlt /> <span>{getLabel("edit")}</span>
-                  </button>
-                  <button className="btn-delete" onClick={() => handleOpenDeleteModal(service.id)}>
-                    <FaTrash /> <span>{getLabel("delete")}</span>
-                  </button>
-                </div>
-              </article>
+              <ServiceCard 
+                key={service.id || index}
+                service={service}
+                isEditable={true}
+                onEdit={handleOpenEditModal}
+                onDelete={handleOpenDeleteModal}
+                onToggleStatus={handleToggleStatus}
+              />
             ))}
           </div>
         )}

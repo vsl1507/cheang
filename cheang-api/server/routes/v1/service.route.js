@@ -148,6 +148,18 @@ router.get("/get/:id", serviceController.getById);
 
 /**
  * @swagger
+ * /api/v1/services/active:
+ *   get:
+ *     summary: Get all active service listings across the platform
+ *     tags: [Services]
+ *     responses:
+ *       200:
+ *         description: List of active services retrieved successfully
+ */
+router.get("/active", serviceController.getAllActiveServices);
+
+/**
+ * @swagger
  * /api/v1/services/user/{id}:
  *   get:
  *     summary: Get all service listings for a specific user ID

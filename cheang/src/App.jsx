@@ -39,6 +39,7 @@ import PrivateRouteUser from "./components/privateRoutes/PrivateRouteUser";
 import ForgotPassword from "./page/ForgotPassword";
 import ScrollToTop from "./components/scrollToTop/ScrollToTop";
 import ServiceEditPage from "./page/ServiceEditPage";
+import ServiceDetailPage from "./page/ServiceDetailPage";
 
 const App = () => {
   return (
@@ -65,6 +66,7 @@ const App = () => {
             <Route path="/cancellation-policy" Component={CancellationPage} />
             <Route path="userlist/:typeservice" Component={UsersList} />
             <Route path="service" Component={AllUsersListPage} />
+            <Route path="service/detail/:serviceId" Component={ServiceDetailPage} />
             <Route path="forgetpassword" Component={ForgotPassword} />
 
             <Route element={<PrivateRoute />}>

@@ -6,6 +6,7 @@ import { useTheme } from "../context/ThemeContext";
 import AppLayout from "../layouts/AppLayout";
 import AdsModal from "../components/adsModal/AdsModal";
 import Card from "../components/card/Card";
+import ServiceCard from "../components/card/ServiceCard";
 import { getServicesAndSubServices } from "../data/Service";
 import { getProvincesAndCities } from "../data/Location";
 import { getSeeMore } from "../data/wordsLanguage";
@@ -167,6 +168,7 @@ const HomePage = () => {
   const [users, setUsers] = useState([]);
   const [searchResults, setSearchResults] = useState(null);
   const [error, setError] = useState(null);
+  const [activeServices, setActiveServices] = useState([]);
 
   // Form Fields
   const [selectedProvince, setSelectedProvince] = useState("");
@@ -209,6 +211,17 @@ const HomePage = () => {
         } else {
           setUsers(data.data || data);
         }
+
+        try {
+          const resServices = await fetch("/api/v1/services/active");
+          const dataServices = await resServices.json();
+          if (dataServices.success !== false) {
+             setActiveServices(dataServices.data || dataServices);
+          }
+        } catch (e) {
+          console.error("Failed to fetch active services:", e);
+        }
+
         setLoading(false);
       } catch (err) {
         setError(err.message);
@@ -486,6 +499,28 @@ const HomePage = () => {
               <h3>{t.step3Title}</h3>
               <p>{t.step3Desc}</p>
             </div>
+          </div>
+        </section>
+
+        {/* 3.5 Featured Services Section */}
+        <section className="home-featured-repairers">
+          <div className="section-title-container">
+            <h2 className="section-title">
+              {language === "kh" ? "សេវាកម្មពេញនិយម" : language === "zh" ? "热门服务" : "Featured Services"}
+            </h2>
+            <p className="section-subtitle">
+              {language === "kh" ? "សេវាកម្មជួសជុលដែលផ្តល់ដោយជាងជំនាញរបស់យើង" : language === "zh" ? "由我们经过验证的专业人员提供的顶级服务" : "Top rated repair services from our verified pros"}
+            </p>
+          </div>
+          
+          <div className="featured-grid">
+            {activeServices.length > 0 ? (
+              activeServices.slice(0, 8).map((service) => (
+                <ServiceCard key={service._id || service.id} service={service} isEditable={false} />
+              ))
+            ) : (
+              <p style={{ textAlign: "center", width: "100%", color: "#64748b" }}>Loading services...</p>
+            )}
           </div>
         </section>
 

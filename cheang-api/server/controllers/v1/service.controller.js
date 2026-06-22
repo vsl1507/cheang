@@ -70,9 +70,21 @@ class ServiceController extends BasicController {
 
   getById = async (req, res) => {
     try {
-      const result = await this.service.getById(req.params.id);
+      const result = await this.service.getById(req.params.id, { populate: ["userRef"] });
       if (result.success) {
         result.data = ServiceMapper.toDTO(result.data);
+      }
+      return ResponseUtil.handleServiceResult(res, result);
+    } catch (error) {
+      return ResponseUtil.internalError(res, error.message);
+    }
+  };
+
+  getAllActiveServices = async (req, res) => {
+    try {
+      const result = await this.service.getActive({}, { populate: ["userRef"] });
+      if (result.success) {
+        result.data = ServiceMapper.toDTOs(result.data);
       }
       return ResponseUtil.handleServiceResult(res, result);
     } catch (error) {

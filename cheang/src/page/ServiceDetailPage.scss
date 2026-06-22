@@ -1,0 +1,335 @@
+@import "../variables";
+
+$pro-orange: #ff7f00;
+$pro-orange-hover: #e65100;
+$text-dark: #1e293b;
+$text-muted: #64748b;
+$border-light: rgba(0, 0, 0, 0.08);
+
+.service-detail-loading,
+.service-detail-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 1.5rem;
+  color: $text-muted;
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba($pro-orange, 0.2);
+    border-top-color: $pro-orange;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.service-detail-page {
+  padding: 2rem 0 5rem;
+  background-color: #f8fafc;
+  min-height: 100vh;
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: none;
+    border: none;
+    color: $text-muted;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 1.5rem;
+    padding: 0.5rem 0;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: $pro-orange;
+    }
+  }
+
+  .service-content-wrapper {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .service-main-info {
+    background: #ffffff;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+
+    .service-hero-image {
+      width: 100%;
+      height: 400px;
+      overflow: hidden;
+      
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .service-text-content {
+      padding: 2.5rem;
+
+      .service-title {
+        font-size: 2rem;
+        font-weight: 850;
+        color: $text-dark;
+        margin: 0 0 1rem;
+        line-height: 1.2;
+      }
+
+      .service-price-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        background: linear-gradient(135deg, rgba($pro-orange, 0.1) 0%, rgba($pro-orange, 0.05) 100%);
+        padding: 0.75rem 1.25rem;
+        border-radius: 1rem;
+        border: 1px solid rgba($pro-orange, 0.2);
+
+        .price-label {
+          font-size: 0.85rem;
+          color: $text-muted;
+          text-transform: uppercase;
+          font-weight: 700;
+          letter-spacing: 1px;
+        }
+
+        .price-value {
+          font-size: 1.5rem;
+          font-weight: 900;
+          color: $pro-orange;
+        }
+      }
+
+      .section-divider {
+        height: 1px;
+        background: $border-light;
+        margin: 2rem 0;
+      }
+
+      .section-heading {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: $text-dark;
+        margin: 0 0 1rem;
+      }
+
+      .service-description {
+        font-size: 1rem;
+        color: #475569;
+        line-height: 1.7;
+        white-space: pre-wrap;
+      }
+    }
+  }
+
+  .service-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    .booking-card, .provider-card {
+      background: #ffffff;
+      border-radius: 1.5rem;
+      padding: 2rem;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+      border: 1px solid $border-light;
+    }
+
+    .booking-card {
+      text-align: center;
+
+      .booking-price {
+        font-size: 2.5rem;
+        font-weight: 900;
+        color: $text-dark;
+        margin: 0 0 1.5rem;
+      }
+
+      .btn-book-now {
+        box-sizing: border-box;
+        display: block;
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, $pro-orange 0%, #ff5500 100%);
+        color: #ffffff;
+        font-size: 1.1rem;
+        font-weight: 800;
+        text-align: center;
+        border-radius: 1rem;
+        text-decoration: none;
+        box-shadow: 0 10px 20px rgba($pro-orange, 0.3);
+        transition: all 0.3s ease;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 12px 25px rgba($pro-orange, 0.4);
+        }
+      }
+
+      .booking-hint {
+        font-size: 0.8rem;
+        color: $text-muted;
+        margin: 1rem 0 0;
+        line-height: 1.5;
+      }
+    }
+
+    .provider-card {
+      .section-heading {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: $text-dark;
+        margin: 0 0 1.5rem;
+      }
+
+      .provider-profile-summary {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+
+        .provider-avatar {
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 2px solid rgba($pro-orange, 0.2);
+        }
+
+        .provider-info {
+          display: flex;
+          flex-direction: column;
+          gap: 0.25rem;
+
+          .provider-name {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: $text-dark;
+            margin: 0;
+          }
+
+          .provider-location {
+            font-size: 0.85rem;
+            color: $text-muted;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+          }
+
+          .provider-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: $text-dark;
+
+            .star-icon {
+              color: #f59e0b;
+            }
+
+            .review-count {
+              color: $text-muted;
+              font-weight: 500;
+            }
+          }
+        }
+      }
+
+      .btn-view-profile {
+        box-sizing: border-box;
+        display: block;
+        width: 100%;
+        padding: 0.85rem;
+        background: #f8fafc;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        color: $text-dark;
+        font-size: 0.95rem;
+        font-weight: 700;
+        text-align: center;
+        border-radius: 0.75rem;
+        text-decoration: none;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: rgba($pro-orange, 0.05);
+          color: $pro-orange;
+          border-color: rgba($pro-orange, 0.2);
+        }
+      }
+    }
+  }
+
+  // Dark Mode
+  &.dark {
+    background-color: #0f172a;
+
+    .service-main-info, .booking-card, .provider-card {
+      background: #1e293b;
+      border-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .service-title, .section-heading, .booking-price, .provider-name {
+      color: #f8fafc;
+    }
+
+    .service-description, .booking-hint {
+      color: #94a3b8;
+    }
+
+    .provider-rating {
+      color: #f8fafc;
+    }
+
+    .btn-view-profile {
+      background: rgba(255, 255, 255, 0.05);
+      color: #f8fafc;
+      border-color: rgba(255, 255, 255, 0.05);
+
+      &:hover {
+        background: rgba($pro-orange, 0.1);
+        color: $pro-orange;
+        border-color: rgba($pro-orange, 0.3);
+      }
+    }
+
+    .section-divider {
+      background: rgba(255, 255, 255, 0.05);
+    }
+  }
+}
+
+// Responsiveness
+@media (max-width: 992px) {
+  .service-detail-page {
+    .service-content-wrapper {
+      grid-template-columns: 1fr;
+    }
+
+    .service-main-info {
+      .service-hero-image {
+        height: 300px;
+      }
+    }
+  }
+}

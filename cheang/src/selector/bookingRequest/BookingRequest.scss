@@ -85,17 +85,40 @@ $border-light: rgba(0, 0, 0, 0.06);
 
       .booking-card-item {
         background: #ffffff;
-        border: 1px solid $border-light;
-        border-radius: 1rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        border-radius: 1.25rem;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.03), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        position: relative;
+        z-index: 1;
+
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0; right: 0; bottom: 0;
+          border-radius: 1.25rem;
+          padding: 2px;
+          background: linear-gradient(135deg, rgba($pro-orange, 0.4), transparent, rgba($pro-orange, 0.1));
+          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          opacity: 0;
+          transition: opacity 0.4s ease;
+          pointer-events: none;
+          z-index: 10;
+        }
 
         &:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 12px 22px -8px rgba(0, 0, 0, 0.06);
+          transform: translateY(-6px) scale(1.01);
+          box-shadow: 0 20px 40px -10px rgba($pro-orange, 0.12), 0 12px 20px -8px rgba(0, 0, 0, 0.06);
+
+          &::before {
+            opacity: 1;
+          }
         }
 
         .booking-card-header {
@@ -233,13 +256,14 @@ $border-light: rgba(0, 0, 0, 0.06);
 
           .service-details-row {
             margin-top: 0.25rem;
-            padding: 0.85rem;
-            background: #f8fafc;
-            border: 1px solid rgba(0, 0, 0, 0.03);
-            border-radius: 0.5rem;
+            padding: 1.25rem;
+            background: linear-gradient(145deg, #fffcf9, #fff5eb);
+            border: 1px solid rgba(255, 127, 0, 0.15);
+            border-radius: 0.75rem;
             display: flex;
             justify-content: space-between;
             gap: 1rem;
+            box-shadow: inset 0 2px 4px rgba(255, 127, 0, 0.02);
 
             .details-block {
               display: flex;
@@ -247,16 +271,17 @@ $border-light: rgba(0, 0, 0, 0.06);
               line-height: 1.35;
 
               .block-label {
-                font-size: 0.65rem;
-                font-weight: 700;
-                color: $text-muted;
+                font-size: 0.7rem;
+                font-weight: 800;
+                color: $pro-orange;
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
+                margin-bottom: 0.25rem;
               }
 
               .block-value {
-                font-size: 0.88rem;
-                font-weight: 750;
+                font-size: 1rem;
+                font-weight: 850;
                 color: $text-dark;
               }
             }
@@ -264,9 +289,12 @@ $border-light: rgba(0, 0, 0, 0.06);
             .price-block {
               align-items: flex-end;
               .block-value {
-                color: $pro-orange;
-                font-size: 1rem;
-                font-weight: 850;
+                font-size: 1.35rem;
+                font-weight: 900;
+                background: linear-gradient(135deg, $pro-orange 0%, #ff5500 100%);
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
               }
             }
           }
@@ -364,10 +392,10 @@ $border-light: rgba(0, 0, 0, 0.06);
           }
 
           .service-details-row {
-            background-color: rgba(255, 255, 255, 0.01);
-            border-color: rgba(255, 255, 255, 0.04);
+            background: linear-gradient(145deg, rgba(255, 127, 0, 0.05), rgba(255, 127, 0, 0.02));
+            border-color: rgba(255, 127, 0, 0.15);
             .details-block {
-              .block-value { color: #cbd5e1; }
+              .block-value { color: #f1f5f9; }
             }
           }
         }

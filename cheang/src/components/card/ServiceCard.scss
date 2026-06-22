@@ -1,0 +1,372 @@
+@import "../../variables";
+
+$pro-orange: #ff7f00;
+$text-dark: #1e293b;
+$text-muted: #64748b;
+
+.service-card-item {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  border-radius: 1.25rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  z-index: 1;
+  height: 100%;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    border-radius: 1.25rem;
+    padding: 2px;
+    background: linear-gradient(135deg, rgba($pro-orange, 0.5), transparent, rgba($pro-orange, 0.1));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  &:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px -10px rgba($pro-orange, 0.15), 0 12px 20px -8px rgba(0, 0, 0, 0.08);
+
+    &::before {
+      opacity: 1;
+    }
+
+    .card-image-wrapper img {
+      transform: scale(1.1) rotate(1deg);
+    }
+    
+    .card-content-body .service-item-title {
+      color: $pro-orange;
+    }
+  }
+
+  .card-image-wrapper {
+    position: relative;
+    height: 190px;
+    width: 100%;
+    overflow: hidden;
+    background-color: #f8fafc;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 60%;
+      background: linear-gradient(to top, rgba(15, 23, 42, 0.8), transparent);
+      pointer-events: none;
+    }
+
+    .card-price-overlay {
+      position: absolute;
+      bottom: 1rem;
+      right: 1rem;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      color: $text-dark;
+      padding: 0.5rem 1rem;
+      border-radius: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1.1;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      z-index: 5;
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: scale(1.05) translateY(-2px);
+      }
+
+      .price-label {
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: $text-muted;
+        font-weight: 800;
+        margin-bottom: 0.15rem;
+      }
+
+      .price-value {
+        font-size: 1.25rem;
+        font-weight: 900;
+        background: linear-gradient(135deg, $pro-orange 0%, #ff5500 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+    }
+
+    .status-badge-floating {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: 2rem;
+      font-size: 0.75rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      z-index: 5;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+
+      .status-dot {
+        width: 0.5rem;
+        height: 0.5rem;
+        border-radius: 50%;
+        display: inline-block;
+        position: relative;
+        
+        &::after {
+          content: '';
+          position: absolute;
+          top: -2px; left: -2px; right: -2px; bottom: -2px;
+          border-radius: 50%;
+          border: 1px solid currentColor;
+          opacity: 0.5;
+          animation: pulseRing 2s infinite cubic-bezier(0.16, 1, 0.3, 1);
+        }
+      }
+
+      &.active {
+        background: rgba(16, 185, 129, 0.9);
+        color: #ffffff;
+        .status-dot {
+          background: #ffffff;
+        }
+      }
+
+      &.draft {
+        background: rgba(71, 85, 105, 0.9);
+        color: #ffffff;
+        .status-dot {
+          background: #ffffff;
+          &::after { display: none; }
+        }
+      }
+
+      &:hover {
+        transform: translateY(-2px) scale(1.05);
+        background: #ff7f00;
+        border-color: rgba(255, 255, 255, 0.4);
+        box-shadow: 0 8px 20px rgba(255, 127, 0, 0.4);
+      }
+    }
+
+    .service-provider-badge {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(8px);
+      padding: 0.3rem 0.8rem 0.3rem 0.3rem;
+      border-radius: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      z-index: 5;
+      
+      .provider-avatar {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+      .provider-name {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: $text-dark;
+      }
+    }
+  }
+
+  .card-content-body {
+    padding: 1.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    background: #ffffff;
+    position: relative;
+    z-index: 2;
+
+    .service-item-title {
+      font-size: 1.15rem;
+      font-weight: 850;
+      color: $text-dark;
+      margin: 0;
+      line-height: 1.3;
+      transition: color 0.3s ease;
+    }
+
+    .service-item-desc {
+      font-size: 0.85rem;
+      color: $text-muted;
+      margin: 0;
+      line-height: 1.6;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  }
+
+  .card-actions-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px dashed rgba(0, 0, 0, 0.08);
+    background: #ffffff;
+    display: flex;
+    gap: 1rem;
+    z-index: 2;
+
+    button {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.65rem;
+      font-size: 0.85rem;
+      font-weight: 800;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-edit {
+      background: #f8fafc;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      color: $text-dark;
+
+      &:hover {
+        background: rgba($pro-orange, 0.05);
+        border-color: rgba($pro-orange, 0.3);
+        color: $pro-orange;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba($pro-orange, 0.1);
+      }
+    }
+
+    .btn-delete {
+      background: #fef2f2;
+      border: 1px solid rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+
+      &:hover {
+        background: #fee2e2;
+        border-color: rgba(239, 68, 68, 0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(239, 68, 68, 0.15);
+      }
+    }
+  }
+
+  // Dark Mode Overrides
+  &.dark {
+    background: #1e1b19;
+    border-color: rgba(255, 255, 255, 0.06);
+
+    .card-image-wrapper {
+      background-color: rgba(255, 255, 255, 0.01);
+      
+      .card-price-overlay {
+        background: rgba(30, 27, 25, 0.95);
+        border-color: rgba(255, 255, 255, 0.1);
+        color: #f1f5f9;
+        .price-label {
+          color: #94a3b8;
+        }
+      }
+
+      .service-provider-badge {
+        background: rgba(30, 27, 25, 0.95);
+        color: #f1f5f9;
+        .provider-name {
+          color: #f1f5f9;
+        }
+      }
+    }
+
+    .card-content-body {
+      background: transparent;
+      .service-item-title {
+        color: #f1f5f9;
+      }
+      .service-item-desc {
+        color: #94a3b8;
+      }
+    }
+
+    .card-actions-footer {
+      background: transparent;
+      border-top-color: rgba(255, 255, 255, 0.06);
+
+      .btn-edit {
+        background-color: rgba(255, 255, 255, 0.03);
+        border-color: rgba(255, 255, 255, 0.06);
+        color: #cbd5e1;
+
+        &:hover {
+          color: #ffaa33;
+          border-color: #ffaa33;
+          background: rgba(255, 170, 51, 0.1);
+        }
+      }
+
+      .btn-delete {
+        background-color: rgba(239, 68, 68, 0.05);
+        border-color: rgba(239, 68, 68, 0.15);
+        color: #ef4444;
+
+        &:hover {
+          background: rgba(239, 68, 68, 0.15);
+        }
+      }
+    }
+  }
+}
+
+// Pulse Ring Animation
+@keyframes pulseRing {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  80% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
