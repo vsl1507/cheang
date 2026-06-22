@@ -62,6 +62,7 @@ $admin-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0
     z-index: 1000;
     transition: transform 0.3s ease;
     box-shadow: 4px 0 20px rgba(0, 0, 0, 0.03);
+    overflow-x: hidden;
 
     // Sidebar logo section
     .sidebar-brand {
@@ -137,6 +138,7 @@ $admin-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0
       flex: 1;
       padding: 1.5rem 1rem;
       overflow-y: auto;
+      overflow-x: hidden;
 
       .nav-section-title {
         display: block;

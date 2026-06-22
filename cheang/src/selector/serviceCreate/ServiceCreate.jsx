@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { FaPlusCircle, FaCloudUploadAlt, FaWrench, FaDollarSign, FaFileAlt } from "react-icons/fa";
+import { FaPlusCircle, FaCloudUploadAlt, FaWrench, FaDollarSign, FaFileAlt, FaSpinner } from "react-icons/fa";
 import { useTheme } from "../../context/ThemeContext";
 import { useLanguage } from "../../context/LanguageContext";
 import Label from "../../components/label/Label";
@@ -12,6 +12,7 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "../../context/ToastContext";
 import "./ServiceCreate.scss";
 
 const ServiceCreate = () => {
@@ -19,6 +20,7 @@ const ServiceCreate = () => {
   const { language } = useLanguage();
   const { currentUser } = useSelector((state) => state.user);
   const fileRef = useRef(null);
+  const { showToast } = useToast();
   
   const [file, setFile] = useState(undefined);
   const [filePerc, setFilePerc] = useState(0);
@@ -29,6 +31,7 @@ const ServiceCreate = () => {
     description: "",
     price: "",
     image: "",
+    isActive: true,
   });
   
   const [error, setError] = useState(false);
@@ -60,6 +63,10 @@ const ServiceCreate = () => {
     uploadError: { en: "Upload failed (Max 2MB)", kh: "ការបញ្ចូលរូបភាពបរាជ័យ (ទំហំធំបំផុត 2MB)", zh: "上传失败（最大 2MB）" },
     submitBtn: { en: "Publish Service", kh: "ផ្សព្វផ្សាយសេវាកម្ម", zh: "发布服务" },
     loadingBtn: { en: "Publishing...", kh: "កំពុងផ្សព្វផ្សាយ...", zh: "正在发布..." },
+    changeImage: { en: "Change Image", kh: "ប្តូររូបភាព", zh: "更换图片" },
+    statusLabel: { en: "Service Status", kh: "ស្ថានភាពសេវាកម្ម", zh: "服务状态" },
+    activeLabel: { en: "Active (Visible in marketplace)", kh: "សកម្ម (បង្ហាញនៅលើផ្សារ)", zh: "上架（在市场中可见）" },
+    draftLabel: { en: "Draft (Hidden from marketplace)", kh: "ព្រាង (លាក់ពីផ្សារ)", zh: "下架（从市场隐藏）" }
   };
 
   const getLabel = (key) => t[key]?.[language] || t[key]?.["en"];
@@ -127,14 +134,24 @@ const ServiceCreate = () => {
       
       if (data.success === false) {
         setError(data.message);
+        showToast(data.message, "error");
         return;
       }
       
-      // Route back to services list
-      navigate("/profile");
-      window.location.reload();
+      showToast(
+        language === "kh" 
+          ? "បានបង្កើតសេវាកម្មដោយជោគជ័យ!" 
+          : language === "zh" 
+            ? "服务发布成功！" 
+            : "Service published successfully!", 
+        "success"
+      );
+      
+      // Route back to services list using synced query param
+      navigate("/profile?tab=service");
     } catch (err) {
       setError(err.message);
+      showToast(err.message, "error");
       setLoading(false);
     }
   };
@@ -191,10 +208,28 @@ const ServiceCreate = () => {
             />
           </div>
 
+          <div className="input-group status-input-group">
+            <span className="status-label-text">{getLabel("statusLabel")}</span>
+            <div className="status-toggle-control">
+              <label className="toggle-switch-wrapper">
+                <input
+                  type="checkbox"
+                  name="isActive"
+                  checked={formData.isActive}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, isActive: e.target.checked }))}
+                />
+                <span className="toggle-slider"></span>
+              </label>
+              <span className={`status-description ${formData.isActive ? "active" : "draft"}`}>
+                {formData.isActive ? getLabel("activeLabel") : getLabel("draftLabel")}
+              </span>
+            </div>
+          </div>
+
           {error && <div className="error-message-box">{error}</div>}
 
           <button type="submit" className="submit-service-btn" disabled={loading}>
-            <FaPlusCircle />
+            {loading ? <FaSpinner className="spin" /> : <FaPlusCircle />}
             <span>{loading ? getLabel("loadingBtn") : getLabel("submitBtn")}</span>
           </button>
         </div>
@@ -220,7 +255,7 @@ const ServiceCreate = () => {
                 <img src={formData.image} alt="Service cover" />
                 <div className="dropzone-overlay">
                   <FaCloudUploadAlt className="overlay-icon" />
-                  <span>{getLabel("changeImage") || "Click to Change"}</span>
+                  <span>{getLabel("changeImage")}</span>
                 </div>
               </div>
             ) : (

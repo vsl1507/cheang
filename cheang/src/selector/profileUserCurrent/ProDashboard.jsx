@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useLocation, useSearchParams } from "react-router-dom";
 import ProAppLayout from "../../layouts/ProAppLayout";
 import ProOverview from "./ProOverview";
 import ServiceSelector from "../serviceSelector/ServiceSelector";
@@ -7,17 +7,23 @@ import ServiceCreate from "../serviceCreate/ServiceCreate";
 import AboutUser from "../aboutUser/AboutUser";
 import SaveUser from "../saveUser/SaveUser";
 import SettingUser from "../settingUser/SettingUser";
+import BookingRequest from "../bookingRequest/BookingRequest";
 
 const ProDashboard = () => {
-  const [activeTab, setActiveTab] = useState("dashboard");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get("tab") || "dashboard";
   const location = useLocation();
+
+  const setActiveTab = (tab) => {
+    setSearchParams({ tab });
+  };
 
   // Sync active tab if passed via router state (e.g. from navbar dropdown clicking Settings)
   useEffect(() => {
     if (location.state?.activeTab) {
-      setActiveTab(location.state.activeTab);
+      setSearchParams({ tab: location.state.activeTab });
     }
-  }, [location]);
+  }, [location, setSearchParams]);
 
   return (
     <ProAppLayout activeTab={activeTab} setActiveTab={setActiveTab}>
@@ -27,6 +33,7 @@ const ProDashboard = () => {
         {activeTab === "addService" && <ServiceCreate />}
         {activeTab === "about" && <AboutUser />}
         {activeTab === "save" && <SaveUser />}
+        {activeTab === "bookings" && <BookingRequest />}
         {activeTab === "setting" && <SettingUser />}
       </div>
     </ProAppLayout>

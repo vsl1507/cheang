@@ -14,12 +14,14 @@ import {
   FaWrench,
 } from "react-icons/fa";
 import ServiceUpdate from "../serviceUpdate/ServiceUpdate";
+import { useNavigate } from "react-router-dom";
 import "./ServiceSelector.scss";
 
 const ServiceSelector = ({ setActiveTab }) => {
   const { theme } = useTheme();
   const { language } = useLanguage();
   const { currentUser } = useSelector((state) => state.user);
+  const navigate = useNavigate();
   
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -58,7 +60,9 @@ const ServiceSelector = ({ setActiveTab }) => {
     },
     cancel: { en: "Cancel", kh: "បោះបង់", zh: "取消" },
     noServices: { en: "No services found matching your criteria.", kh: "រកមិនឃើញសេវាកម្មដែលត្រូវគ្នានឹងតម្រូវការរបស់អ្នកទេ។", zh: "未找到符合您条件的服务。" },
-    price: { en: "Price", kh: "តម្លៃ", zh: "价格" }
+    price: { en: "Price", kh: "តម្លៃ", zh: "价格" },
+    activeStatus: { en: "Active", kh: "សកម្ម", zh: "上架中" },
+    draftStatus: { en: "Draft", kh: "ព្រាង", zh: "下架" }
   };
 
   const getLabel = (key) => t[key]?.[language] || t[key]?.["en"];
@@ -87,6 +91,28 @@ const ServiceSelector = ({ setActiveTab }) => {
     }
   };
 
+  const handleToggleStatus = async (serviceId, currentStatus) => {
+    try {
+      const res = await fetch(`/api/service/update/${serviceId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ isActive: !currentStatus }),
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        console.error(data.message);
+        return;
+      }
+      setServices((prev) =>
+        prev.map((s) => (s.id === serviceId ? { ...s, isActive: !currentStatus } : s))
+      );
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+
   const handleServiceDelete = async () => {
     if (!selectedServiceId) return;
     try {
@@ -98,7 +124,7 @@ const ServiceSelector = ({ setActiveTab }) => {
         console.error(data.message);
         return;
       }
-      setServices((prev) => prev.filter((s) => s._id !== selectedServiceId));
+      setServices((prev) => prev.filter((s) => s.id !== selectedServiceId));
       setShowDeleteModal(false);
       setSelectedServiceId(null);
     } catch (err) {
@@ -113,8 +139,7 @@ const ServiceSelector = ({ setActiveTab }) => {
   };
 
   const handleOpenEditModal = (serviceId) => {
-    setSelectedServiceId(serviceId);
-    setShowEditModal(true);
+    navigate(`/service/edit/${serviceId}`);
   };
 
   // Filter and Sort logic
@@ -180,8 +205,8 @@ const ServiceSelector = ({ setActiveTab }) => {
           </div>
         ) : (
           <div className="services-grid">
-            {filteredServices.map((service) => (
-              <article className="service-card-item" key={service._id}>
+            {filteredServices.map((service, index) => (
+              <article className="service-card-item" key={service.id || index}>
                 <div className="card-image-wrapper">
                   <img
                     src={service.image}
@@ -195,6 +220,14 @@ const ServiceSelector = ({ setActiveTab }) => {
                     <span className="price-label">{getLabel("price")}</span>
                     <span className="price-value">${service.price}</span>
                   </div>
+                  <div 
+                    className={`status-badge-floating ${service.isActive !== false ? "active" : "draft"}`} 
+                    onClick={() => handleToggleStatus(service.id, service.isActive !== false)}
+                    title="Click to toggle active/draft status"
+                  >
+                    <span className="status-dot"></span>
+                    <span className="status-text">{service.isActive !== false ? getLabel("activeStatus") : getLabel("draftStatus")}</span>
+                  </div>
                 </div>
 
                 <div className="card-content-body">
@@ -203,10 +236,10 @@ const ServiceSelector = ({ setActiveTab }) => {
                 </div>
 
                 <div className="card-actions-footer">
-                  <button className="btn-edit" onClick={() => handleOpenEditModal(service._id)}>
+                  <button className="btn-edit" onClick={() => handleOpenEditModal(service.id)}>
                     <FaPenAlt /> <span>{getLabel("edit")}</span>
                   </button>
-                  <button className="btn-delete" onClick={() => handleOpenDeleteModal(service._id)}>
+                  <button className="btn-delete" onClick={() => handleOpenDeleteModal(service.id)}>
                     <FaTrash /> <span>{getLabel("delete")}</span>
                   </button>
                 </div>
@@ -216,21 +249,7 @@ const ServiceSelector = ({ setActiveTab }) => {
         )}
       </main>
 
-      {/* Edit Service Modal */}
-      {showEditModal && (
-        <div className="pro-modal-overlay">
-          <div className="pro-modal-wrapper edit-service-modal">
-            <ServiceUpdate
-              serviceId={selectedServiceId}
-              onClose={() => {
-                setShowEditModal(false);
-                setSelectedServiceId(null);
-              }}
-              onSuccess={fetchShowService}
-            />
-          </div>
-        </div>
-      )}
+
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (

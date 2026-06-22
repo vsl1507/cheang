@@ -232,6 +232,55 @@ $border-light: rgba(0, 0, 0, 0.06);
               color: #ffaa33;
             }
           }
+
+          .status-badge-floating {
+            position: absolute;
+            top: 0.75rem;
+            left: 0.75rem;
+            padding: 0.3rem 0.6rem;
+            border-radius: 2rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+
+            .status-dot {
+              width: 0.4rem;
+              height: 0.4rem;
+              border-radius: 50%;
+              display: inline-block;
+            }
+
+            &.active {
+              background: rgba(16, 185, 129, 0.85);
+              color: #ffffff;
+              .status-dot {
+                background: #10b981;
+                box-shadow: 0 0 6px #10b981;
+              }
+            }
+
+            &.draft {
+              background: rgba(71, 85, 105, 0.85);
+              color: #ffffff;
+              .status-dot {
+                background: #cbd5e1;
+              }
+            }
+
+            &:hover {
+              transform: translateY(-1px);
+              background: #ff7f00;
+              border-color: rgba(255, 255, 255, 0.3);
+              box-shadow: 0 6px 14px rgba(255, 127, 0, 0.3);
+            }
+          }
         }
 
         .card-content-body {

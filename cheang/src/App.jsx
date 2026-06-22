@@ -38,6 +38,7 @@ import ProfileUserCurrentPage from "./page/ProfileUserCurrentPage";
 import PrivateRouteUser from "./components/privateRoutes/PrivateRouteUser";
 import ForgotPassword from "./page/ForgotPassword";
 import ScrollToTop from "./components/scrollToTop/ScrollToTop";
+import ServiceEditPage from "./page/ServiceEditPage";
 
 const App = () => {
   return (
@@ -66,10 +67,10 @@ const App = () => {
             <Route path="service" Component={AllUsersListPage} />
             <Route path="forgetpassword" Component={ForgotPassword} />
 
-            {/* Private Routes */}
             <Route element={<PrivateRoute />}>
               <Route path="profile/:userId" Component={ProfileUserPage} />
               <Route path="profile" Component={ProfileUserCurrentPage} />
+              <Route path="service/edit/:serviceId" Component={ServiceEditPage} />
             </Route>
 
             <Route element={<PrivateRouteUser />}>

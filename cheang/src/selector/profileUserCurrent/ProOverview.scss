@@ -198,6 +198,90 @@ $border-light: rgba(0, 0, 0, 0.06);
     }
   }
 
+  // Visual Analytics Chart Card
+  .overview-chart-card {
+    background: #ffffff;
+    border: 1px solid $border-light;
+    border-radius: 1rem;
+    padding: 1.75rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+
+      .chart-title {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: $text-dark;
+        margin: 0 0 0.25rem;
+        letter-spacing: -0.2px;
+      }
+
+      .chart-subtitle {
+        font-size: 0.85rem;
+        color: $text-muted;
+        margin: 0;
+        font-weight: 500;
+      }
+
+      .chart-legend {
+        display: flex;
+        gap: 1rem;
+        font-size: 0.8rem;
+        font-weight: 700;
+
+        .legend-item {
+          display: flex;
+          align-items: center;
+          gap: 0.35rem;
+
+          .legend-color {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+          }
+
+          &.views .legend-color {
+            background-color: #ff7f00;
+          }
+
+          &.clicks .legend-color {
+            background-color: #10b981;
+          }
+        }
+      }
+    }
+
+    .chart-body {
+      width: 100%;
+      height: 180px;
+      position: relative;
+
+      .analytics-svg {
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+      }
+    }
+
+    .chart-footer-labels {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 1rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: $text-muted;
+    }
+  }
+
   // Content Layout
   .overview-content-layout {
     display: grid;
@@ -471,6 +555,28 @@ $border-light: rgba(0, 0, 0, 0.06);
 
 // Dark Mode Overrides
 .pro-overview-container.dark {
+  .overview-chart-card {
+    background: #1e1b19;
+    border-color: rgba(255, 255, 255, 0.06);
+
+    .chart-header {
+      .chart-title {
+        color: #f1f5f9;
+      }
+      .chart-subtitle {
+        color: #94a3b8;
+      }
+      .chart-legend {
+        .legend-item {
+          color: #cbd5e1;
+        }
+      }
+    }
+    .chart-footer-labels {
+      color: #94a3b8;
+    }
+  }
+
   .overview-metrics-grid {
     .metric-card {
       background: #1e1b19;

@@ -7,10 +7,14 @@ import {
   FaInfoCircle,
   FaMapMarkerAlt,
   FaPhoneAlt,
-  FaRegSave,
-  FaSave,
-  FaThumbsDown,
+  FaRegBookmark,
+  FaBookmark,
+  FaTrash,
   FaWrench,
+  FaCheck,
+  FaSpinner,
+  FaPaperPlane,
+  FaStar,
 } from "react-icons/fa";
 import Tag from "../../components/tag/Tag";
 import Label from "../../components/label/Label";
@@ -24,10 +28,9 @@ import {
 import ShowStar from "../../components/starRating/ShowStar";
 import "./ProfileUser.scss";
 import TextBorder from "../../components/textBorder/TextBorder";
-import Button from "../../components/button/Button";
 import ServiceSelectorUser from "../serviceSelectorUser/ServiceSelectorUser";
-import { NavigationLink } from "../../components/navigationLink/NavigationLink";
 import AboutUser from "../aboutUser/AboutUser";
+
 const ProfileUser = () => {
   const { theme } = useTheme();
   const [user, setUser] = useState(null);
@@ -38,6 +41,11 @@ const ProfileUser = () => {
   const params = useParams();
   const { currentUser } = useSelector((state) => state.user);
   const [formData, setFormData] = useState({});
+  
+  // Custom submit loading indicators
+  const [isSubmittingRating, setIsSubmittingRating] = useState(false);
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+  const [isSavingUser, setIsSavingUser] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -45,9 +53,7 @@ const ProfileUser = () => {
     }
   }, [user]);
 
-  ////////////////Rating////////////////////////////
-  const [userRating, setUserRating] = useState(0);
-
+  // Rating Change Handler
   const handleRatingChange = (newRating) => {
     setFormData({
       ...formData,
@@ -57,7 +63,9 @@ const ProfileUser = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.userRating) return;
     try {
+      setIsSubmittingRating(true);
       dispatch(updateUserStart());
       const res = await fetch(`/api/user/rating/${params.userId}`, {
         method: "POST",
@@ -72,6 +80,7 @@ const ProfileUser = () => {
       const data = await res.json();
       if (data.success === false) {
         dispatch(updateUserFailure(data.message));
+        setIsSubmittingRating(false);
         return;
       }
 
@@ -82,8 +91,10 @@ const ProfileUser = () => {
       );
       const updatedUserData = await updatedUserResponse.json();
       setUser(updatedUserData.data || updatedUserData);
+      setIsSubmittingRating(false);
     } catch (error) {
       dispatch(updateUserFailure(error.message));
+      setIsSubmittingRating(false);
     }
   };
 
@@ -93,8 +104,7 @@ const ProfileUser = () => {
         user.ratings.length
       : 0;
 
-  ///////////Comments//////////
-  const [comments, setComments] = useState([]);
+  // Comments
   const [newComment, setNewComment] = useState("");
 
   const handleCommentChange = (event) => {
@@ -102,9 +112,10 @@ const ProfileUser = () => {
   };
 
   const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+    if (!newComment.trim()) return;
     try {
-      e.preventDefault();
-
+      setIsSubmittingComment(true);
       dispatch(updateUserStart());
 
       const res = await fetch(`/api/user/comment/${params.userId}`, {
@@ -122,6 +133,7 @@ const ProfileUser = () => {
       const data = await res.json();
       if (data.success === false) {
         dispatch(updateUserFailure(data.message));
+        setIsSubmittingComment(false);
         return;
       }
       setUser(data.data || data);
@@ -133,8 +145,10 @@ const ProfileUser = () => {
       setUser(updatedUserData.data || updatedUserData);
 
       setNewComment("");
+      setIsSubmittingComment(false);
     } catch (error) {
       dispatch(updateUserFailure(error.message));
+      setIsSubmittingComment(false);
     }
   };
 
@@ -163,9 +177,10 @@ const ProfileUser = () => {
     }
   };
 
-  ///////////Save User//////////
+  // Save User
   const handleSave = async () => {
     try {
+      setIsSavingUser(true);
       dispatch(updateUserStart());
 
       const res = await fetch(`/api/user/save/${params.userId}`, {
@@ -181,8 +196,10 @@ const ProfileUser = () => {
       } else {
         dispatch(updateUserSuccess(data.data || data));
       }
+      setIsSavingUser(false);
     } catch (error) {
       dispatch(updateUserFailure(error.message));
+      setIsSavingUser(false);
     }
   };
 
@@ -214,87 +231,114 @@ const ProfileUser = () => {
 
   return (
     <div className={`ProfileContainer ${theme}`}>
-      <div className="ProfileContainer-container">
-        <div className="ProfileContainer-container-left">
-          {loading && <p className="loading-text">Loading...</p>}
-          {error && <p className="error-text">Something went wrong!</p>}
-          {user && !loading && !error && (
-            user.userPro ? (
-              <div className={`userprofileDetail ${theme} pro-card`}>
-                <div className="profile-banner pro-banner"></div>
-                <div className="userserviceDetail-container" key={user.id}>
-                  <div className="profile-avatar-wrapper">
-                    <Profile src={user.avatar} />
-                    <span className="account-badge pro-badge">Pro</span>
-                  </div>
-                  <Label label={user.brandName || "Repair Provider"} />
-                  <h3 className="profile-owner-name">Owner: {user.nameuser}</h3>
-                  <div className="userserviceDetail-container-tag">
-                    {user.mainService && user.mainService !== "None" && user.mainService !== "NONE" && <Tag label={user.mainService} />}
-                    {user.subService && user.subService !== "None" && user.subService !== "NONE" && <Tag label={user.subService} />}
-                    {(!user.mainService || user.mainService === "None" || user.mainService === "NONE") && <Tag label="Handyman Account" />}
-                  </div>
-                  <div className="userserviceDetail-container-rate">
+      {/* 1. Full-bleed Hero Cover Banner */}
+      <div className={`profile-hero-banner ${user?.userPro ? "pro-banner" : "client-banner"}`}></div>
+
+      {/* 2. Overlapping Profile Header Block */}
+      {user && !loading && !error && (
+        <div className="profile-hero-header-wrapper">
+          <div className="profile-hero-header">
+            <div className="profile-hero-left">
+              <div className="profile-avatar-wrapper">
+                <Profile src={user.avatar} />
+                <span className={`account-badge ${user.userPro ? "pro-badge" : "client-badge"}`}>
+                  {user.userPro ? "Pro" : "Client"}
+                </span>
+              </div>
+              
+              <div className="profile-hero-details">
+                <h1 className="profile-brand-title">
+                  {user.userPro ? (user.brandName || "Repair Provider") : user.nameuser}
+                </h1>
+                {user.userPro && <p className="profile-owner-name">Owner: {user.nameuser}</p>}
+                
+                <div className="profile-hero-tags">
+                  {user.userPro ? (
+                    <>
+                      {user.mainService && user.mainService !== "None" && user.mainService !== "NONE" && <Tag label={user.mainService} />}
+                      {user.subService && user.subService !== "None" && user.subService !== "NONE" && <Tag label={user.subService} />}
+                      {(!user.mainService || user.mainService === "None" || user.mainService === "NONE") && <Tag label="Handyman Account" />}
+                    </>
+                  ) : (
+                    <Tag label="Client Account" />
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="profile-hero-right">
+              {user.userPro && (
+                <div className="profile-hero-rating-summary">
+                  <div className="hero-rating-row">
                     <ShowStar rating={averageRating.toFixed(2)} />
-                    <p>{averageRating.toFixed(2)}</p>
+                    <span className="rating-num">{averageRating.toFixed(2)}</span>
                   </div>
-                  <div className="userserviceDetail-container-detail">
-                    <div className="TextBorder-container">
-                      <TextBorder
-                        label={<FaMapMarkerAlt />}
-                        text={
-                          (user.city && user.city !== "None" && user.city !== "NONE") || 
-                          (user.province && user.province !== "None" && user.province !== "NONE") ?
-                          (user.city + " , " + user.province) :
-                          "Location not set"
-                        }
-                      />
-                      <TextBorder
-                        label={<FaPhoneAlt />}
-                        text={user.phone && user.phone !== "None" && user.phone !== "NONE" ? user.phone : "No phone added"}
-                      />
-                    </div>
-                  </div>
-                  <div className="userserviceDetail-container-rating">
-                    <StarRating
-                      userId={params.userId}
-                      onChange={handleRatingChange}
-                    />
-                    <button onClick={handleSubmit}>Submit Rating</button>
-                  </div>
+                  <span className="rating-count">({user.ratings?.length || 0} reviews)</span>
                 </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 3. Centered Content Grid */}
+      <div className="ProfileContainer-container">
+        {/* Left Column Card: Contact Location Info & Rating Widget */}
+        <div className="ProfileContainer-container-left">
+          {loading && (
+            <div className="loading-card">
+              <FaSpinner className="spin loading-icon" />
+              <p className="loading-text">Loading...</p>
+            </div>
+          )}
+          {error && (
+            <div className="error-card">
+              <p className="error-text">Something went wrong!</p>
+            </div>
+          )}
+          {user && !loading && !error && (
+            <div className="profile-details-sidebar-card">
+              <h3 className="sidebar-card-title">Contact & Location</h3>
+              
+              <div className="sidebar-details-list">
+                <TextBorder
+                  label={<FaMapMarkerAlt />}
+                  text={
+                    (user.city && user.city !== "None" && user.city !== "NONE") || 
+                    (user.province && user.province !== "None" && user.province !== "NONE") ?
+                    (user.city + " , " + user.province) :
+                    "Location not set"
+                  }
+                />
+                <TextBorder
+                  label={<FaPhoneAlt />}
+                  text={user.phone && user.phone !== "None" && user.phone !== "NONE" ? user.phone : "No phone added"}
+                />
               </div>
-            ) : (
-              <div className={`userprofileDetail ${theme} client-card`}>
-                <div className="profile-banner client-banner"></div>
-                <div className="userserviceDetail-container" key={user.id}>
-                  <div className="profile-avatar-wrapper">
-                    <Profile src={user.avatar} />
-                    <span className="account-badge client-badge">Client</span>
-                  </div>
-                  <Label label={user.nameuser} />
-                  <div className="userserviceDetail-container-detail">
-                    <div className="TextBorder-container">
-                      <TextBorder
-                        label={<FaMapMarkerAlt />}
-                        text={
-                          (user.city && user.city !== "None" && user.city !== "NONE") || 
-                          (user.province && user.province !== "None" && user.province !== "NONE") ?
-                          (user.city + " , " + user.province) :
-                          "Location not set"
-                        }
-                      />
-                      <TextBorder
-                        label={<FaPhoneAlt />}
-                        text={user.phone && user.phone !== "None" && user.phone !== "NONE" ? user.phone : "No phone added"}
-                      />
-                    </div>
-                  </div>
+
+              {user.userPro && (
+                <div className="userserviceDetail-container-rating">
+                  <h4 className="rating-widget-title">Rate this provider</h4>
+                  <StarRating
+                    userId={params.userId}
+                    onChange={handleRatingChange}
+                  />
+                  <button 
+                    type="button" 
+                    className="btn-submit-rating"
+                    onClick={handleSubmit} 
+                    disabled={isSubmittingRating || !formData.userRating}
+                  >
+                    {isSubmittingRating ? <FaSpinner className="spin" /> : <FaCheck />}
+                    <span>{isSubmittingRating ? "Submitting..." : "Submit Rating"}</span>
+                  </button>
                 </div>
-              </div>
-            )
+              )}
+            </div>
           )}
         </div>
+
+        {/* Right Column: Dynamic Workspace Sub-sections */}
         <div className="ProfileContainer-container-right">
           <div className="profileTodo">
             {user && !loading && !error && (
@@ -304,25 +348,22 @@ const ProfileUser = () => {
                     <>
                       <div className="serviceDetail-container">
                         <button className="disabled" disabled>
-                          <FaWrench style={{ marginRight: "8px" }} />
-                          Service
+                          <FaWrench />
+                          <span>Service</span>
                         </button>
-                        <button onClick={() => setNormal("about")}>
-                          <FaInfoCircle style={{ marginRight: "8px" }} />
-                          About
+                        <button type="button" onClick={() => setNormal("about")}>
+                          <FaInfoCircle />
+                          <span>About</span>
                         </button>
-                        <button onClick={handleSave}>
-                          {isAlreadySaved ? (
-                            <>
-                              <FaRegSave style={{ marginRight: "8px" }} />
-                              Unsave
-                            </>
+                        <button type="button" className="save-profile-btn" onClick={handleSave} disabled={isSavingUser}>
+                          {isSavingUser ? (
+                            <FaSpinner className="spin" />
+                          ) : isAlreadySaved ? (
+                            <FaBookmark />
                           ) : (
-                            <>
-                              <FaSave style={{ marginRight: "8px" }} />
-                              Save
-                            </>
+                            <FaRegBookmark />
                           )}
+                          <span>{isAlreadySaved ? "Saved" : "Save"}</span>
                         </button>
                       </div>
                       <ServiceSelectorUser />
@@ -330,26 +371,23 @@ const ProfileUser = () => {
                   ) : normal === "about" ? (
                     <>
                       <div className="serviceDetail-container">
-                        <button onClick={() => setNormal("service")}>
-                          <FaWrench style={{ marginRight: "8px" }} />
-                          Service
+                        <button type="button" onClick={() => setNormal("service")}>
+                          <FaWrench />
+                          <span>Service</span>
                         </button>
                         <button className="disabled" disabled>
-                          <FaInfoCircle style={{ marginRight: "8px" }} />
-                          About
+                          <FaInfoCircle />
+                          <span>About</span>
                         </button>
-                        <button onClick={handleSave}>
-                          {isAlreadySaved ? (
-                            <>
-                              <FaRegSave style={{ marginRight: "8px" }} />
-                              Unsave
-                            </>
+                        <button type="button" className="save-profile-btn" onClick={handleSave} disabled={isSavingUser}>
+                          {isSavingUser ? (
+                            <FaSpinner className="spin" />
+                          ) : isAlreadySaved ? (
+                            <FaBookmark />
                           ) : (
-                            <>
-                              <FaSave style={{ marginRight: "8px" }} />
-                              Save
-                            </>
+                            <FaRegBookmark />
                           )}
+                          <span>{isAlreadySaved ? "Saved" : "Save"}</span>
                         </button>
                       </div>
                       <AboutUser />
@@ -362,21 +400,18 @@ const ProfileUser = () => {
                     <>
                       <div className="serviceDetail-container">
                         <button className="disabled" disabled>
-                          <FaInfoCircle style={{ marginRight: "8px" }} />
-                          About
+                          <FaInfoCircle />
+                          <span>About</span>
                         </button>
-                        <button onClick={handleSave}>
-                          {isAlreadySaved ? (
-                            <>
-                              <FaRegSave style={{ marginRight: "8px" }} />
-                              Unsave
-                            </>
+                        <button type="button" className="save-profile-btn" onClick={handleSave} disabled={isSavingUser}>
+                          {isSavingUser ? (
+                            <FaSpinner className="spin" />
+                          ) : isAlreadySaved ? (
+                            <FaBookmark />
                           ) : (
-                            <>
-                              <FaSave style={{ marginRight: "8px" }} />
-                              Save
-                            </>
+                            <FaRegBookmark />
                           )}
+                          <span>{isAlreadySaved ? "Saved" : "Save"}</span>
                         </button>
                       </div>
                       <AboutUser />
@@ -389,41 +424,60 @@ const ProfileUser = () => {
         </div>
       </div>
 
+      {/* 4. Guestbook Reviews Segment */}
       {user && !loading && !error && user.userPro && (
         <div className="ProfileContainer-container-bottom">
-          <Label label="Comments" />
+          <Label label="Community Reviews" />
+          
           <div className="comment-container">
-            <Profile src={currentUser?.avatar} />
+            <div className="comment-avatar-wrapper">
+              <Profile src={currentUser?.avatar} />
+            </div>
             <textarea
               className="comment-box"
               value={newComment}
               onChange={handleCommentChange}
-              placeholder="Type your comment..."
+              placeholder="Leave a review or comment on this handyman..."
             />
-            <button onClick={handleCommentSubmit}>
-              <FaComment style={{ marginRight: "8px" }} />
-              Comments
+            <button type="button" className="btn-comment-submit" onClick={handleCommentSubmit} disabled={isSubmittingComment || !newComment.trim()}>
+              {isSubmittingComment ? <FaSpinner className="spin" /> : <FaPaperPlane />}
+              <span>{isSubmittingComment ? "Posting..." : "Comment"}</span>
             </button>
           </div>
+          
           <div className="comment-area">
             <ul>
-              {user?.comments.map((comment, index) => (
-                <li className="comment-item" key={index}>
-                  <div className="comment-area-profile">
-                    <Profile src={comment.userAvatar} />
-                    <p>{comment.userName}</p>
-                  </div>
-                  <div className="comment-area-comments">
-                    <p>{comment.comment}</p>
-                    {currentUser && (currentUser._id === comment.userComment || currentUser.isAdmin) && (
-                      <NavigationLink
-                        onClick={() => handleCommentDelete(comment._id)}
-                        value="Delete"
-                      />
-                    )}
-                  </div>
-                </li>
-              ))}
+              {user?.comments && user.comments.length > 0 ? (
+                user.comments.map((comment, index) => (
+                  <li className="comment-item" key={index}>
+                    <div className="comment-item-header">
+                      <div className="comment-area-profile">
+                        <Profile src={comment.userAvatar} />
+                        <p className="commenter-name">{comment.userName}</p>
+                      </div>
+                      
+                      {currentUser && (currentUser._id === comment.userComment || currentUser.isAdmin) && (
+                        <button 
+                          type="button" 
+                          className="delete-comment-btn"
+                          onClick={() => handleCommentDelete(comment._id)}
+                          title="Delete comment"
+                        >
+                          <FaTrash />
+                        </button>
+                      )}
+                    </div>
+                    
+                    <div className="comment-area-comments">
+                      <p className="comment-text">{comment.comment}</p>
+                    </div>
+                  </li>
+                ))
+              ) : (
+                <div className="no-comments-fallback">
+                  <p>No reviews or comments yet. Be the first to write one!</p>
+                </div>
+              )}
             </ul>
           </div>
         </div>

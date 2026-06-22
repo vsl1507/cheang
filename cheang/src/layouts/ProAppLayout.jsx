@@ -3,7 +3,7 @@ import { useLanguage } from "../context/LanguageContext";
 import { useTheme } from "../context/ThemeContext";
 import LanguageSelector from "../components/languageSelector/LanguageSelector";
 import ThemeSelector from "../components/themeSelector/ThemeSelector";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Logo from "../assets/logo.png";
 import {
@@ -18,6 +18,7 @@ import {
   FaTimes,
   FaUser,
   FaChartLine,
+  FaCalendarAlt,
 } from "react-icons/fa";
 import {
   signOutUserStart,
@@ -27,12 +28,13 @@ import {
 import Profile from "../components/profile/Profile.jsx";
 import "./ProAppLayout.scss";
 
-const ProAppLayout = ({ children, activeTab, setActiveTab }) => {
+const ProAppLayout = ({ children, activeTab, setActiveTab, breadcrumbActiveLabel }) => {
   const { language, changeLanguage } = useLanguage();
   const { theme } = useTheme();
   const { currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const [showSidebar, setShowSidebar] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 
@@ -82,6 +84,11 @@ const ProAppLayout = ({ children, activeTab, setActiveTab }) => {
       id: "save",
       label: { en: "Saved Items", kh: "របស់រក្សាទុក", zh: "已保存" },
       icon: <FaSave />,
+    },
+    {
+      id: "bookings",
+      label: { en: "Booking Requests", kh: "ការកក់សេវាកម្ម", zh: "预约请求" },
+      icon: <FaCalendarAlt />,
     },
     {
       id: "setting",
@@ -197,7 +204,24 @@ const ProAppLayout = ({ children, activeTab, setActiveTab }) => {
               <FaHome className="breadcrumb-home-icon" />
               <span className="breadcrumb-parent">Pro Dashboard</span>
               <span className="breadcrumb-separator">/</span>
-              <span className="breadcrumb-active">{getActiveTabLabel()}</span>
+              {location.pathname.includes("/service/edit") ? (
+                <>
+                  <span 
+                    className="breadcrumb-parent"
+                    onClick={() => {
+                      if (setActiveTab) setActiveTab("service");
+                      navigate("/profile", { state: { activeTab: "service" } });
+                    }}
+                    style={{ cursor: "pointer" }}
+                  >
+                    {menuItems.find(m => m.id === "service")?.label[language] || "My Services"}
+                  </span>
+                  <span className="breadcrumb-separator">/</span>
+                  <span className="breadcrumb-active">{breadcrumbActiveLabel || "Edit Service"}</span>
+                </>
+              ) : (
+                <span className="breadcrumb-active">{getActiveTabLabel()}</span>
+              )}
             </div>
           </div>
 

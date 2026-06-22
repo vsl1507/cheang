@@ -125,7 +125,7 @@
 }
 
 // Light vs Dark Styles
-.navbar-wrapper.light {
+.navbar-wrapper.light, .pro-layout-wrapper.light, .admin-layout-wrapper.light {
   .lang-btn {
     color: #333;
     border-color: rgba(0, 0, 0, 0.12);
@@ -136,7 +136,7 @@
   }
 }
 
-.navbar-wrapper.dark {
+.navbar-wrapper.dark, .pro-layout-wrapper.dark, .admin-layout-wrapper.dark {
   .lang-btn {
     color: #eee;
     border-color: rgba(255, 255, 255, 0.15);

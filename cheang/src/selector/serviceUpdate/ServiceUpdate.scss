@@ -1,298 +1,56 @@
-@import "../../variables";
+@import "../serviceCreate/ServiceCreate";
 
-$pro-orange: #ff7f00;
-$pro-orange-hover: #e65100;
-$text-dark: #1e293b;
-$text-muted: #64748b;
-
-.service-update-fetching {
+// Custom styles for edit action row (Cancel & Save changes side-by-side)
+.edit-actions-row {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 3rem;
-  font-size: 1.1rem;
-  color: $text-muted;
-  font-weight: 500;
-}
-
-.service-update-modal-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.25rem;
   width: 100%;
-  animation: fadeInUp 0.3s ease-out;
+  margin-top: 0.5rem;
 
-  .modal-header {
+  .cancel-service-btn {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-    padding-bottom: 1rem;
+    justify-content: center;
+    background: #f1f5f9;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    color: #475569;
+    padding: 0.85rem 1.75rem;
+    font-weight: 800;
+    font-size: 0.98rem;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    flex: 1;
+    height: 3rem;
 
-    .label-title {
-      font-size: 1.25rem;
-      font-weight: 800;
-      color: $text-dark;
-      margin: 0;
+    &:hover:not(:disabled) {
+      background: #e2e8f0;
+      color: #1e293b;
     }
-
-    .close-modal-btn {
-      background: none;
-      border: none;
-      font-size: 1.25rem;
-      color: $text-muted;
-      cursor: pointer;
-      padding: 0.25rem;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
-
-      &:hover {
-        background-color: rgba(0, 0, 0, 0.05);
-        color: $text-dark;
-      }
+    
+    &:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
     }
   }
 
-  .service-update-form {
-    display: grid;
-    grid-template-columns: 3fr 2fr;
-    gap: 2rem;
-
-    .form-left {
-      display: flex;
-      flex-direction: column;
-      gap: 1.25rem;
-    }
-
-    .input-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      position: relative;
-
-      textarea {
-        width: 100%;
-        min-height: 110px;
-        padding: 0.75rem 1rem;
-        border-radius: 0.5rem;
-        border: 2px solid rgba(0, 0, 0, 0.08);
-        background-color: #f8fafc;
-        font-family: inherit;
-        font-size: 0.95rem;
-        color: $text-dark;
-        resize: vertical;
-        transition: all 0.2s ease;
-
-        &:focus {
-          outline: none;
-          background-color: #ffffff;
-          border-color: $pro-orange;
-          box-shadow: 0 0 0 3px rgba(255, 127, 0, 0.15);
-        }
-      }
-
-      .char-counter {
-        align-self: flex-end;
-        font-size: 0.75rem;
-        color: $text-muted;
-        margin-top: 0.25rem;
-      }
-    }
-
-    .error-message {
-      color: #ef4444;
-      font-size: 0.85rem;
-      font-weight: 600;
-      margin: 0;
-    }
-
-    .modal-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 0.75rem;
-      margin-top: 1rem;
-
-      button {
-        padding: 0.65rem 1.25rem;
-        font-size: 0.9rem;
-        font-weight: 700;
-        border-radius: 0.5rem;
-        cursor: pointer;
-        transition: all 0.25s ease;
-      }
-
-      .btn-cancel {
-        background: #f1f5f9;
-        border: 1px solid rgba(0, 0, 0, 0.05);
-        color: #475569;
-
-        &:hover:not(:disabled) {
-          background: #e2e8f0;
-        }
-      }
-
-      .btn-submit {
-        background: linear-gradient(135deg, $pro-orange 0%, #ff9f40 100%);
-        border: none;
-        color: #ffffff;
-        box-shadow: 0 4px 12px rgba(255, 127, 0, 0.2);
-
-        &:hover:not(:disabled) {
-          transform: translateY(-1px);
-          box-shadow: 0 6px 16px rgba(255, 127, 0, 0.3);
-        }
-
-        &:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-      }
-    }
-
-    // Image Upload Column
-    .form-right {
-      .image-preview-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem;
-        border: 2px dashed rgba(0, 0, 0, 0.08);
-        border-radius: 0.75rem;
-        padding: 1.5rem;
-        background: #f8fafc;
-
-        img {
-          width: 100%;
-          max-width: 180px;
-          height: 180px;
-          object-fit: cover;
-          border-radius: 0.5rem;
-          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        .change-img-btn {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          background: #ffffff;
-          border: 1px solid rgba(0, 0, 0, 0.08);
-          color: $text-dark;
-          padding: 0.5rem 1rem;
-          border-radius: 0.5rem;
-          font-weight: 700;
-          font-size: 0.85rem;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-
-          &:hover {
-            border-color: $pro-orange;
-            color: $pro-orange;
-          }
-        }
-
-        .upload-status {
-          font-size: 0.75rem;
-          font-weight: 700;
-          text-align: center;
-          padding: 0.25rem 0.75rem;
-          border-radius: 1rem;
-
-          &.info {
-            background-color: rgba(255, 127, 0, 0.08);
-            color: $pro-orange;
-          }
-
-          &.success {
-            background-color: rgba(16, 185, 129, 0.08);
-            color: #10b981;
-          }
-
-          &.error {
-            background-color: rgba(239, 68, 68, 0.08);
-            color: #ef4444;
-          }
-        }
-      }
-    }
+  .submit-service-btn {
+    flex: 2.2;
+    margin: 0;
   }
 }
 
 // Dark Mode Overrides
-.service-update-modal-content.dark {
-  .modal-header {
-    border-bottom-color: rgba(255, 255, 255, 0.06);
+.service-create-container.dark {
+  .edit-actions-row {
+    .cancel-service-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.06);
+      color: #cbd5e1;
 
-    .label-title {
-      color: #f1f5f9;
-    }
-
-    .close-modal-btn {
-      &:hover {
-        background-color: rgba(255, 255, 255, 0.05);
+      &:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.08);
         color: #f1f5f9;
-      }
-    }
-  }
-
-  .service-update-form {
-    .input-group {
-      textarea {
-        background-color: rgba(255, 255, 255, 0.02);
-        border-color: rgba(255, 255, 255, 0.06);
-        color: #f1f5f9;
-
-        &:focus {
-          background-color: rgba(255, 255, 255, 0.01);
-          border-color: $pro-orange;
-        }
-      }
-    }
-
-    .modal-actions {
-      .btn-cancel {
-        background: rgba(255, 255, 255, 0.05);
-        border-color: rgba(255, 255, 255, 0.06);
-        color: #cbd5e1;
-
-        &:hover:not(:disabled) {
-          background: rgba(255, 255, 255, 0.08);
-        }
-      }
-    }
-
-    .form-right {
-      .image-preview-container {
-        background-color: rgba(255, 255, 255, 0.01);
-        border-color: rgba(255, 255, 255, 0.06);
-
-        .change-img-btn {
-          background-color: rgba(255, 255, 255, 0.03);
-          border-color: rgba(255, 255, 255, 0.06);
-          color: #cbd5e1;
-
-          &:hover {
-            color: #ffaa33;
-            border-color: #ffaa33;
-          }
-        }
-      }
-    }
-  }
-}
-
-// Mobile layout
-@media (max-width: 768px) {
-  .service-update-modal-content {
-    .service-update-form {
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-
-      .form-right {
-        order: -1; // Image preview first on mobile
       }
     }
   }

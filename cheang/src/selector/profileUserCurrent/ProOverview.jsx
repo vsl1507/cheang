@@ -66,6 +66,10 @@ const ProOverview = ({ setActiveTab }) => {
     price: { en: "Price", kh: "តម្លៃ", zh: "价格" },
     specialty: { en: "Specialty", kh: "ជំនាញ", zh: "专业" },
     location: { en: "Location", kh: "ទីតាំង", zh: "位置" },
+    weeklyAnalytics: { en: "Weekly Impressions & Clicks", kh: "ការមើលឃើញ និងការចុចប្រចាំសប្តាហ៍", zh: "每周曝光与点击量" },
+    analyticsDesc: { en: "Monitor how often clients view and click on your listed services.", kh: "តាមដានភាពញឹកញាប់ដែលអតិថិជនមើល និងចុចលើសេវាកម្មរបស់អ្នក។", zh: "监控客户查看和点击您列出的服务的频率。" },
+    profileImpressions: { en: "Impressions", kh: "ការមើលឃើញ", zh: "曝光量" },
+    serviceClicks: { en: "Clicks", kh: "ការចុច", zh: "点击量" }
   };
 
   const getLabel = (key) => t[key]?.[language] || t[key]?.["en"];
@@ -143,6 +147,66 @@ const ProOverview = ({ setActiveTab }) => {
           </div>
         </div>
       </section>
+      
+      {/* Visual Analytics Chart */}
+      <section className="overview-chart-card">
+        <div className="chart-header">
+          <div className="chart-title-group">
+            <h3 className="chart-title">{getLabel("weeklyAnalytics")}</h3>
+            <p className="chart-subtitle">{getLabel("analyticsDesc")}</p>
+          </div>
+          <div className="chart-legend">
+            <span className="legend-item views"><span className="legend-color"></span> {getLabel("profileImpressions")}</span>
+            <span className="legend-item clicks"><span className="legend-color"></span> {getLabel("serviceClicks")}</span>
+          </div>
+        </div>
+        <div className="chart-body">
+          <svg className="analytics-svg" viewBox="0 0 800 240" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="viewsGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#ff7f00" stopOpacity="0.45" />
+                <stop offset="100%" stopColor="#ff7f00" stopOpacity="0.0" />
+              </linearGradient>
+              <linearGradient id="clicksGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#10b981" stopOpacity="0.45" />
+                <stop offset="100%" stopColor="#10b981" stopOpacity="0.0" />
+              </linearGradient>
+            </defs>
+            
+            {/* Grid Lines */}
+            <line x1="0" y1="40" x2="800" y2="40" stroke="rgba(148, 163, 184, 0.08)" strokeWidth="1" />
+            <line x1="0" y1="100" x2="800" y2="100" stroke="rgba(148, 163, 184, 0.08)" strokeWidth="1" />
+            <line x1="0" y1="160" x2="800" y2="160" stroke="rgba(148, 163, 184, 0.08)" strokeWidth="1" />
+            <line x1="0" y1="220" x2="800" y2="220" stroke="rgba(148, 163, 184, 0.08)" strokeWidth="1" />
+            
+            {/* Area under curves */}
+            <path d="M 0 220 L 0 120 Q 120 70 240 140 T 480 80 T 720 130 Q 760 140 800 110 L 800 220 Z" fill="url(#viewsGrad)" />
+            <path d="M 0 220 L 0 170 Q 120 150 240 180 T 480 140 T 720 170 Q 760 180 800 160 L 800 220 Z" fill="url(#clicksGrad)" />
+            
+            {/* Curves */}
+            <path d="M 0 120 Q 120 70 240 140 T 480 80 T 720 130 Q 760 140 800 110" fill="none" stroke="#ff7f00" strokeWidth="3.5" strokeLinecap="round" />
+            <path d="M 0 170 Q 120 150 240 180 T 480 140 T 720 170 Q 760 180 800 160" fill="none" stroke="#10b981" strokeWidth="3" strokeLinecap="round" />
+            
+            {/* Glowing Nodes */}
+            <circle cx="240" cy="140" r="5" fill="#ff7f00" stroke="#ffffff" strokeWidth="2.5" />
+            <circle cx="480" cy="80" r="5" fill="#ff7f00" stroke="#ffffff" strokeWidth="2.5" />
+            <circle cx="720" cy="130" r="5" fill="#ff7f00" stroke="#ffffff" strokeWidth="2.5" />
+
+            <circle cx="240" cy="180" r="5" fill="#10b981" stroke="#ffffff" strokeWidth="2.5" />
+            <circle cx="480" cy="140" r="5" fill="#10b981" stroke="#ffffff" strokeWidth="2.5" />
+            <circle cx="720" cy="170" r="5" fill="#10b981" stroke="#ffffff" strokeWidth="2.5" />
+          </svg>
+        </div>
+        <div className="chart-footer-labels">
+          <span>Mon</span>
+          <span>Tue</span>
+          <span>Wed</span>
+          <span>Thu</span>
+          <span>Fri</span>
+          <span>Sat</span>
+          <span>Sun</span>
+        </div>
+      </section>
 
       {/* Main Grid Content */}
       <div className="overview-content-layout">
@@ -202,8 +266,8 @@ const ProOverview = ({ setActiveTab }) => {
                 </button>
               </div>
             ) : (
-              recentServices.map((service) => (
-                <div key={service._id} className="mini-service-card">
+              recentServices.map((service, index) => (
+                <div key={service.id || index} className="mini-service-card">
                   <div className="service-img-wrapper">
                     <img
                       src={service.image}
